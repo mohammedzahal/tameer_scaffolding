@@ -68,8 +68,8 @@
             </ul>
 
             <!-- Search input -->
-            <div class="input-group" style="max-width: 320px;">
-                <span class="input-group-text bg-white border-end-0 text-secondary"><i class="bi bi-search"></i></span>
+            <div class="input-group input-group-sm" style="max-width: 260px;">
+                <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
                 <input type="text" id="quoteSearchInput" class="form-control border-start-0" 
                        placeholder="Search quotation or client..." oninput="filterQuotesTable()">
             </div>
@@ -96,24 +96,24 @@
                         <tr class="quote-row" data-status="{{ 'sent' if project.project_status == 'Quote Sent' else 'lead' }}"
                             data-search="{{ project.company_name|lower }} {{ project.quotation_ref|lower }} {{ project.attn|lower }}">
                             <td>
-                                <div class="fw-bold text-dark" style="font-size: 1.05rem;">{{ project.company_name }}</div>
-                                <div class="text-secondary" style="font-size: 0.88rem; font-weight: 500;">
+                                <div class="fw-semibold text-dark">{{ project.company_name }}</div>
+                                <div class="text-muted small">
                                     {{ project.attn or 'N/A' }} {% if project.location %}• {{ project.location }}{% endif %}
                                 </div>
                             </td>
                             <td>
-                                <span class="fw-bold text-dark font-monospace" style="font-size: 0.95rem;">
+                                <span class="fw-semibold text-secondary font-monospace" style="font-size: 0.82rem;">
                                     {{ project.quotation_ref or '-' }}
                                 </span>
                             </td>
-                            <td style="font-size: 0.92rem; color: #334155; font-weight: 500;">
+                            <td class="text-muted small">
                                 {{ project.quotation_date or 'Recent' }}
                             </td>
                             <td class="text-end">
                                 {% if project.grand_total and project.grand_total > 0 %}
-                                    <span class="fw-bold text-dark" style="font-size: 1.12rem;">SAR {{ "{:,.2f}".format(project.grand_total) }}</span>
+                                    <span class="fw-bold text-dark">SAR {{ "{:,.2f}".format(project.grand_total) }}</span>
                                 {% else %}
-                                    <span class="text-muted" style="font-size: 0.9rem;">Not Calculated</span>
+                                    <span class="text-muted small">Not Calculated</span>
                                 {% endif %}
                             </td>
                             <td class="text-center">
@@ -124,9 +124,9 @@
                                 {% endif %}
                             </td>
                             <td class="text-end">
-                                <div class="d-inline-flex align-items-center gap-2">
+                                <div class="d-inline-flex align-items-center gap-1">
                                     <a href="{{ url_for('quote_builder', project_id=project.project_id) }}" 
-                                       class="btn btn-secondary-tmr btn-sm" title="Edit / Open Quote">
+                                       class="btn btn-secondary-tmr btn-sm py-1 px-2" title="Edit / Open Quote">
                                         <i class="bi bi-pencil"></i>
                                         <span>Edit</span>
                                     </a>
@@ -136,26 +136,26 @@
                                         <button class="icon-action-btn" type="button" data-bs-toggle="dropdown" title="Export Quotation">
                                             <i class="bi bi-download"></i>
                                         </button>
-                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-2" style="font-size: 0.95rem; border-radius: 8px;">
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.85rem; border-radius: 8px;">
                                             <li>
-                                                 <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 fw-medium" href="{{ url_for('download_pdf', project_id=project.project_id) }}">
-                                                    <i class="bi bi-file-earmark-pdf text-danger fs-5"></i> PDF (.pdf)
+                                                 <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_pdf', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-pdf text-danger"></i> PDF (.pdf)
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 fw-medium" href="{{ url_for('download_word', project_id=project.project_id) }}">
-                                                    <i class="bi bi-file-earmark-word text-primary fs-5"></i> Word (.docx)
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_word', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-word text-primary"></i> Word (.docx)
                                                 </a>
                                             </li>
                                             <li>
-                                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 fw-medium" href="{{ url_for('download_excel', project_id=project.project_id) }}">
-                                                    <i class="bi bi-file-earmark-excel text-success fs-5"></i> Excel (.xlsx)
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_excel', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-excel text-success"></i> Excel (.xlsx)
                                                 </a>
                                             </li>
                                             <li><hr class="dropdown-divider my-1"></li>
                                             <li>
-                                                <a class="dropdown-item py-2 px-3 d-flex align-items-center gap-2 fw-medium" href="{{ url_for('print_quote', project_id=project.project_id) }}" target="_blank">
-                                                    <i class="bi bi-printer text-dark fs-5"></i> Print View
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('print_quote', project_id=project.project_id) }}" target="_blank">
+                                                    <i class="bi bi-printer text-dark"></i> Print View
                                                 </a>
                                             </li>
                                         </ul>
