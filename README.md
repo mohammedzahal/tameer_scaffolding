@@ -24,9 +24,15 @@ An enterprise quotation engine and lead management system for **Tameer Al Mesaha
 pip install -r requirements.txt
 ```
 
-### Running the App
+### Running the App Locally
 - Double-click `run.bat`, or run:
 ```bash
 python app.py
 ```
 - Open [http://localhost:5001](http://localhost:5001) in your browser.
+
+## Cloud Deployment (Vercel)
+- Fully configured with `vercel.json` and serverless entrypoint in `api/index.py`.
+- Uses cross-platform dependencies without platform-specific binary requirements.
+- Uses Python 3.12 and lightweight serverless SQLite storage.
+
