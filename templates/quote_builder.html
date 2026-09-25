@@ -112,75 +112,32 @@
         </div>
 
         <!-- SECTION 2: ITEMS TABLE -->
-        <div class="mini-card builder-card mb-4">
-            <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2 bg-white">
-                <div class="d-flex align-items-center gap-2">
-                    <span class="fw-bold text-dark" style="font-size: 0.98rem;">Selected Scaffolding Materials & Quantities</span>
-                    <span id="itemsCountBadge" class="badge bg-light text-secondary border px-2 py-1" style="font-size: 0.78rem;">0 items</span>
-                </div>
-                <div class="d-flex align-items-center gap-2">
+        <div class="mini-card overflow-hidden mb-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+                <span class="fw-bold text-dark" style="font-size: 0.95rem;">Scaffolding Components & Quantities</span>
+                <div class="d-flex gap-2">
                     <button type="button" class="btn btn-secondary-tmr btn-sm" data-bs-toggle="modal" data-bs-target="#catalogModal" onclick="filterCatalog()">
-                        <i class="bi bi-grid-3x3-gap"></i>
+                        <i class="bi bi-search"></i>
                         <span>Browse 136 Catalog</span>
                     </button>
-                    <button type="button" class="btn btn-primary-tmr btn-sm" onclick="addEmptyRow()">
+                    <button type="button" class="btn btn-secondary-tmr btn-sm" onclick="addEmptyRow()">
                         <i class="bi bi-plus-lg"></i>
                         <span>Add Row</span>
                     </button>
-                    <button type="button" class="btn btn-outline-danger btn-sm px-2" onclick="clearAllRows()" title="Clear all rows">
-                        <i class="bi bi-trash"></i>
-                    </button>
                 </div>
             </div>
 
-            <!-- Quick Product Search & Category Bar -->
-            <div class="p-3 bg-light border-bottom position-relative">
-                <div class="row g-2 align-items-center">
-                    <div class="col-lg-8 position-relative">
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                            <input type="text" id="quickProductSearch" class="form-control border-start-0 py-2" 
-                                   placeholder="Quick search & add component (e.g. 2.5m Ledger, 3.0m Standard, Swivel Coupler, LVL Board)..." 
-                                   autocomplete="off" oninput="handleQuickSearch(this)" onfocus="handleQuickSearch(this)">
-                            <button class="btn btn-outline-secondary btn-sm" type="button" onclick="clearQuickSearch()" id="clearQuickSearchBtn" style="display: none;">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                        <!-- Live Search Results Dropdown -->
-                        <div id="quickSearchResults" class="quick-search-dropdown shadow-lg d-none"></div>
-                    </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <small class="text-muted"><i class="bi bi-info-circle me-1"></i>Type to search 136 standard items or click below</small>
-                    </div>
-                </div>
-
-                <!-- Quick Category Filter Chips -->
-                <div class="d-flex flex-wrap gap-1 mt-2 pt-1 align-items-center">
-                    <span class="text-muted small me-2" style="font-size: 0.76rem; font-weight: 600;">CATEGORIES:</span>
-                    <button type="button" class="category-chip active" onclick="filterChipCategory('', this)">All (136)</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Ledgers', this)">Ledgers</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Standards', this)">Standards</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Intermediate Transoms', this)">Transoms</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Scaffold Tubes', this)">Tubes</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Couplers & Clamps', this)">Couplers</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('LVL Boards', this)">LVL Boards</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Jacks & Bases', this)">Jacks & Bases</button>
-                    <button type="button" class="category-chip" onclick="filterChipCategory('Ladders', this)">Ladders</button>
-                </div>
-            </div>
-
-            <!-- Table -->
-            <div class="table-responsive builder-table-container">
+            <div class="table-responsive">
                 <table class="clean-table builder-table" id="itemsTable">
                     <thead>
                         <tr>
                             <th style="width: 45px;" class="text-center">#</th>
-                            <th style="min-width: 320px;">Component Description</th>
-                            <th style="width: 95px;" class="text-center">Unit</th>
-                            <th style="width: 110px;" class="text-end">Qty</th>
+                            <th style="min-width: 280px;">Component Description (Type to search 136 items)</th>
+                            <th style="width: 90px;" class="text-center">Unit</th>
+                            <th style="width: 100px;" class="text-end">Qty</th>
                             <th style="width: 120px;" class="text-end">Rate (SAR)</th>
                             <th style="width: 130px;" class="text-end">Amount (SAR)</th>
-                            <th style="min-width: 160px;">Remarks / Specs</th>
+                            <th style="min-width: 140px;">Remarks</th>
                             <th style="width: 45px;" class="text-center"></th>
                         </tr>
                     </thead>
@@ -188,39 +145,20 @@
                         <!-- Populated dynamically via JS -->
                     </tbody>
                 </table>
-
-                <!-- Empty State if no items -->
-                <div id="emptyTableState" class="text-center py-5 d-none">
-                    <i class="bi bi-box-seam text-muted" style="font-size: 2.2rem;"></i>
-                    <p class="text-dark fw-semibold mt-2 mb-1" style="font-size: 0.95rem;">No Scaffolding Components Added Yet</p>
-                    <p class="text-muted small mb-3">Use the quick search bar above or browse the catalog to add items to this quotation.</p>
-                    <div class="d-inline-flex gap-2">
-                        <button type="button" class="btn btn-secondary-tmr btn-sm" data-bs-toggle="modal" data-bs-target="#catalogModal" onclick="filterCatalog()">
-                            <i class="bi bi-grid-3x3-gap me-1"></i> Browse 136 Catalog
-                        </button>
-                        <button type="button" class="btn btn-primary-tmr btn-sm" onclick="addEmptyRow()">
-                            <i class="bi bi-plus-lg me-1"></i> Add Custom Row
-                        </button>
-                    </div>
-                </div>
             </div>
 
             <!-- Footer Toolbar and Totals -->
             <div class="p-3 bg-white border-top">
                 <div class="row align-items-center">
                     <div class="col-md-6 mb-3 mb-md-0">
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-secondary-tmr btn-sm" onclick="addEmptyRow()">
-                                <i class="bi bi-plus-lg"></i> Add Custom Line
-                            </button>
-                            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#catalogModal" onclick="filterCatalog()">
-                                <i class="bi bi-grid-3x3-gap"></i> Open Full Catalog
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-secondary-tmr btn-sm" onclick="addEmptyRow()">
+                            <i class="bi bi-plus-lg"></i> Add Line Item
+                        </button>
+                        <small class="text-muted ms-2">Start typing in description to auto-select from 136 items.</small>
                     </div>
 
                     <div class="col-md-6">
-                        <div class="totals-summary-box ms-auto" style="max-width: 380px;">
+                        <div class="totals-summary-box ms-auto" style="max-width: 360px;">
                             <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
                                 <span class="text-muted">Total (Subtotal):</span>
                                 <span class="fw-semibold text-dark" id="summarySubtotal">SAR 0.00</span>
@@ -285,58 +223,37 @@
 
 </div>
 
-<!-- ENHANCED CATALOG MODAL -->
+<!-- MINIMAL CATALOG MODAL -->
 <div class="modal fade" id="catalogModal" tabindex="-1">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 14px;">
-            <div class="modal-header border-bottom px-4 py-3 bg-white">
-                <div>
-                    <h6 class="modal-title fw-bold text-dark mb-0">Browse Scaffolding Catalog (136 Items)</h6>
-                    <small class="text-muted">Click "+ Add" to add any components directly into your quotation</small>
-                </div>
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="modal-header border-bottom px-4 py-3">
+                <h6 class="modal-title fw-bold text-dark">Scaffolding Components (136 Items)</h6>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body p-4 bg-light">
-                <div class="card border-0 shadow-sm p-3 mb-3 bg-white" style="border-radius: 10px;">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
-                                <input type="text" id="catalogSearchInput" class="form-control border-start-0" 
-                                       placeholder="Filter by name, size or material..." oninput="filterCatalog()">
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <select id="catalogCategorySelect" class="form-select" onchange="filterCatalog()">
-                                <!-- Categories populated dynamically -->
-                            </select>
-                        </div>
-                        <div class="col-md-2 text-md-end">
-                            <span id="catalogFilteredCount" class="badge bg-light text-dark border p-2">136 items</span>
-                        </div>
+            <div class="modal-body p-3">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-7">
+                        <input type="text" id="catalogSearchInput" class="form-control form-control-sm" 
+                               placeholder="Search component name..." oninput="filterCatalog()">
+                    </div>
+                    <div class="col-md-5">
+                        <select id="catalogCategorySelect" class="form-select form-select-sm" onchange="filterCatalog()">
+                            <!-- Categories populated dynamically -->
+                        </select>
                     </div>
                 </div>
 
-                <div class="row g-2" id="catalogItemsList" style="max-height: 480px; overflow-y: auto;">
-                    <!-- Items rendered dynamically as cards -->
+                <div class="list-group list-group-flush border rounded-3" id="catalogItemsList" style="max-height: 380px; overflow-y: auto;">
+                    <!-- Items rendered dynamically -->
                 </div>
             </div>
-            <div class="modal-footer bg-white px-4 py-3 border-top d-flex justify-content-between align-items-center" style="border-radius: 0 0 14px 14px;">
-                <div>
-                    <span id="modalAddedCountBadge" class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 fw-semibold">
-                        <i class="bi bi-check-circle me-1"></i> Ready to add components
-                    </span>
-                </div>
-                <button type="button" class="btn btn-primary-tmr px-4" data-bs-dismiss="modal">Done & Return to Quote</button>
+            <div class="modal-footer bg-light px-4 py-2 border-top" style="border-radius: 0 0 12px 12px;">
+                <button type="button" class="btn btn-secondary-tmr btn-sm" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Raw Safe JSON data for client hydration -->
-<script type="application/json" id="initialItemsData">
-{{ project.items_json | safe if project.items_json else '[]' }}
-</script>
 
 {% endblock %}
 
@@ -346,8 +263,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         let initialItems = [];
         try {
-            const rawEl = document.getElementById("initialItemsData");
-            const rawJson = rawEl ? rawEl.textContent.trim() : "";
+            const rawJson = '{{ project.items_json | safe }}';
             if (rawJson && rawJson !== 'None' && rawJson !== '[]') {
                 initialItems = JSON.parse(rawJson);
             }
@@ -358,12 +274,10 @@
         if (initialItems && initialItems.length > 0) {
             initialItems.forEach(item => addRow(item));
         } else {
-            // Seed standard sample starter items for new quotes
             addRow({ desc: '2.5m Ledger', unit: 'Pcs.', qty: 100, rate: 35.00, remarks: '' });
             addRow({ desc: '1.8m Ledger', unit: 'Pcs.', qty: 50, rate: 28.00, remarks: '' });
             addRow({ desc: '3.0m Vertical Standard', unit: 'Pcs.', qty: 50, rate: 64.00, remarks: '' });
         }
-        recalculateTotals();
     });
 </script>
 {% endblock %}

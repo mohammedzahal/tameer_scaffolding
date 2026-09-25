@@ -1,9 +1,20 @@
 import sqlite3
 import os
+import shutil
 import re
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tameer_crm.db')
+# Serverless environment support (Vercel has read-only root, writable /tmp)
+if os.environ.get('VERCEL'):
+    LOCAL_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tameer_crm.db')
+    DB_PATH = '/tmp/tameer_crm.db'
+    if not os.path.exists(DB_PATH) and os.path.exists(LOCAL_DB):
+        try:
+            shutil.copyfile(LOCAL_DB, DB_PATH)
+        except Exception as e:
+            print("Notice: Could not copy template db to /tmp:", e)
+else:
+    DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'tameer_crm.db')
 
 SCAFFOLDING_COMPONENTS = [
     # Ledgers

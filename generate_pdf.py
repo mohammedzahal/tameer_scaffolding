@@ -63,47 +63,50 @@ class NumberedCanvas(canvas.Canvas):
 def build_quote_pdf(quote_data):
     """
     Builds a high quality PDF quotation.
-    First tries Word COM to export the exact .docx layout, falling back to ReportLab.
+    First tries Word COM on Windows, falling back to pure ReportLab cross-platform.
     """
-    # Try Word COM for 100% exact rendering of the Word template
-    try:
-        from generate_word import build_quote_word
-        import win32com.client
-        import pythoncom
+    import sys
+    if sys.platform == 'win32':
+        try:
+            from generate_word import build_quote_word
+            import win32com.client
+            import pythoncom
 
-        pythoncom.CoInitialize()
-        docx_stream = build_quote_word(quote_data)
+            pythoncom.CoInitialize()
+            docx_stream = build_quote_word(quote_data)
 
-        with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as tmp_docx:
-            tmp_docx.write(docx_stream.read())
-            tmp_docx_path = tmp_docx.name
+            with tempfile.NamedTemporaryFile(suffix='.docx', delete=False) as tmp_docx:
+                tmp_docx.write(docx_stream.read())
+                tmp_docx_path = tmp_docx.name
 
-        tmp_pdf_path = tmp_docx_path.replace('.docx', '.pdf')
+            tmp_pdf_path = tmp_docx_path.replace('.docx', '.pdf')
 
-        word = win32com.client.Dispatch('Word.Application')
-        word.Visible = False
-        word.DisplayAlerts = 0
+            word = win32com.client.Dispatch('Word.Application')
+            word.Visible = False
+            word.DisplayAlerts = 0
 
-        doc = word.Documents.Open(os.path.abspath(tmp_docx_path), ReadOnly=True)
-        doc.SaveAs(os.path.abspath(tmp_pdf_path), FileFormat=17) # wdFormatPDF = 17
-        doc.Close(False)
-        word.Quit()
+            doc = word.Documents.Open(os.path.abspath(tmp_docx_path), ReadOnly=True)
+            doc.SaveAs(os.path.abspath(tmp_pdf_path), FileFormat=17) # wdFormatPDF = 17
+            doc.Close(False)
+            word.Quit()
 
-        with open(tmp_pdf_path, 'rb') as f:
-            pdf_bytes = f.read()
+            with open(tmp_pdf_path, 'rb') as f:
+                pdf_bytes = f.read()
 
-        # Clean up temp files
-        try: os.remove(tmp_docx_path)
-        except: pass
-        try: os.remove(tmp_pdf_path)
-        except: pass
+            # Clean up temp files
+            try: os.remove(tmp_docx_path)
+            except: pass
+            try: os.remove(tmp_pdf_path)
+            except: pass
 
-        buf = io.BytesIO(pdf_bytes)
-        buf.seek(0)
-        return buf
-    except Exception as e:
-        print(f"Word COM PDF export fallback triggered: {e}")
-        return build_reportlab_pdf(quote_data)
+            buf = io.BytesIO(pdf_bytes)
+            buf.seek(0)
+            return buf
+        except Exception as e:
+            print(f"Word COM PDF export fallback triggered: {e}")
+            return build_reportlab_pdf(quote_data)
+
+    return build_reportlab_pdf(quote_data)
 
 def build_reportlab_pdf(quote_data):
     """
