@@ -28,10 +28,10 @@
         <div class="d-flex align-items-center gap-2">
             {% if project.project_status == 'Quote Sent' or project.grand_total > 0 %}
                 <div class="dropdown">
-                    <button class="btn btn-secondary-tmr dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-secondary-tmr dropdown-toggle" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-download me-1"></i> Export
                     </button>
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.85rem; border-radius: 8px;">
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="border-radius: 8px;">
                         <li>
                             <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_pdf', project_id=project.project_id) }}">
                                 <i class="bi bi-file-earmark-pdf text-danger"></i> PDF (.pdf)
@@ -57,7 +57,7 @@
                 </div>
             {% endif %}
 
-            <button type="button" class="btn btn-primary-tmr btn-sm" onclick="document.getElementById('quoteForm').submit();">
+            <button type="button" class="btn btn-primary-tmr" onclick="document.getElementById('quoteForm').submit();">
                 <i class="bi bi-check2"></i>
                 <span>Save & Calculate</span>
             </button>
@@ -72,7 +72,7 @@
         <input type="hidden" name="grand_total" id="hiddenGrandTotal" value="{{ project.grand_total or 0.0 }}">
         <input type="hidden" name="items_json" id="hiddenItemsJson" value='{{ project.items_json or "[]" }}'>
 
-        <!-- SECTION 1: CLIENT & QUOTE DETAILS -->
+        <!-- SECTION 1: COMPACT CLIENT & QUOTE DETAILS -->
         <div class="mini-card p-3 mb-4">
             <div class="row g-2">
                 <div class="col-md-3">
@@ -158,7 +158,7 @@
                     </div>
 
                     <div class="col-md-6">
-                        <div class="totals-summary-box ms-auto" style="max-width: 340px;">
+                        <div class="totals-summary-box ms-auto" style="max-width: 360px;">
                             <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
                                 <span class="text-muted">Total (Subtotal):</span>
                                 <span class="fw-semibold text-dark" id="summarySubtotal">SAR 0.00</span>

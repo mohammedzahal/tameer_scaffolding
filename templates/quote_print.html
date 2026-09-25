@@ -12,124 +12,161 @@
             margin: 0;
         }
 
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #525659;
             margin: 0;
             padding: 20px 0;
             font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
             color: #000000;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
+        /* Exactly matches A4 PDF geometry (210mm x 297mm) */
         .sheet {
             background: #FFFFFF;
             width: 210mm;
-            min-height: 297mm;
+            height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 12mm 15mm;
+            padding: 0;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            overflow: hidden;
         }
 
+        /* Header banner aligns with PDF: x=12mm, y=10mm from top, width=186mm, height=24mm */
+        .banner-header {
+            position: absolute;
+            top: 10mm;
+            left: 12mm;
+            width: 186mm;
+            height: 24mm;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        /* Footer banner aligns with PDF: x=12mm, y=6mm from bottom, width=186mm, height=18mm */
+        .banner-footer {
+            position: absolute;
+            bottom: 6mm;
+            left: 12mm;
+            width: 186mm;
+            height: 18mm;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        /* Centered Watermark */
         .watermark {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 140mm;
+            width: 120mm;
             opacity: 0.08;
             pointer-events: none;
             z-index: 0;
         }
 
+        /* Content Layer matches PDF SimpleDocTemplate: left=14mm, right=14mm, top=34mm, bottom=26mm (width=182mm) */
         .content-layer {
-            position: relative;
+            position: absolute;
+            top: 34mm;
+            left: 14mm;
+            right: 14mm;
+            bottom: 26mm;
             z-index: 1;
-            flex-grow: 1;
+            overflow: hidden;
         }
 
-        .banner-header {
-            width: 100%;
-            height: auto;
-            max-height: 25mm;
-            object-fit: contain;
-            margin-bottom: 4mm;
-        }
-
-        .banner-footer {
-            width: 100%;
-            height: auto;
-            max-height: 20mm;
-            object-fit: contain;
-            margin-top: 5mm;
-        }
-
-        .quote-table {
+        /* Client Info and Reference Header */
+        .client-info-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 9pt;
-            margin-top: 3mm;
+            line-height: 1.35;
+            margin-bottom: 2mm;
+        }
+
+        .client-info-table td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        /* Table fits exactly to 182mm width matching PDF columns */
+        .quote-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 8pt;
+            margin-top: 2.5mm;
             margin-bottom: 3mm;
         }
 
         .quote-table th, .quote-table td {
-            border: 1px solid #000000;
-            padding: 3px 5px;
+            border: 0.5px solid #000000;
+            padding: 2.5px 4px;
             vertical-align: middle;
         }
 
         .quote-table th {
             text-align: center;
             font-weight: bold;
-            background-color: #f7f7f7;
+            background-color: #F8F8F8;
+            font-size: 8pt;
         }
 
         .totals-label {
             font-weight: bold;
             text-align: right;
-            background-color: #f7f7f7;
+            background-color: #F4F4F4;
         }
 
         .totals-val {
             font-weight: bold;
             text-align: right;
-            background-color: #f7f7f7;
+            background-color: #F4F4F4;
         }
 
-        /* Floating Toolbar */
+        /* Floating Action Toolbar */
         .print-toolbar {
             position: fixed;
             top: 20px;
             right: 20px;
             background: #FFFFFF;
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 9999;
             display: flex;
-            gap: 10px;
+            gap: 8px;
+            align-items: center;
         }
 
         @media print {
             body {
-                background: none;
-                padding: 0;
+                background: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             .print-toolbar {
                 display: none !important;
             }
             .sheet {
-                box-shadow: none;
-                margin: 0;
-                width: 100%;
-                min-height: 100vh;
+                box-shadow: none !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
                 page-break-after: always;
+                break-after: page;
             }
             .sheet:last-child {
                 page-break-after: avoid;
+                break-after: avoid;
             }
         }
     </style>
@@ -138,17 +175,17 @@
 
     <!-- Floating Action Toolbar -->
     <div class="print-toolbar no-print">
-        <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()">
+        <button class="btn btn-primary btn-sm fw-bold px-3" onclick="window.print()">
             <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
         </button>
+        <a href="{{ url_for('download_pdf', project_id=project.project_id) }}" class="btn btn-outline-danger btn-sm">
+            <i class="bi bi-file-earmark-pdf-fill me-1"></i> Download PDF
+        </a>
         <a href="{{ url_for('download_word', project_id=project.project_id) }}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-file-earmark-word-fill me-1"></i> Word
         </a>
         <a href="{{ url_for('download_excel', project_id=project.project_id) }}" class="btn btn-outline-success btn-sm">
             <i class="bi bi-file-earmark-excel-fill me-1"></i> Excel
-        </a>
-        <a href="{{ url_for('download_pdf', project_id=project.project_id) }}" class="btn btn-outline-danger btn-sm">
-            <i class="bi bi-file-earmark-pdf-fill me-1"></i> PDF
         </a>
         <a href="{{ url_for('quote_builder', project_id=project.project_id) }}" class="btn btn-outline-secondary btn-sm">
             <i class="bi bi-pencil me-1"></i> Edit
@@ -157,22 +194,20 @@
 
     <!-- ================= PAGE 1 ================= -->
     <div class="sheet">
+        <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Header">
         <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
 
         <div class="content-layer">
-            <!-- Header Banner -->
-            <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
-
             <!-- Client & Ref Header Table -->
-            <table style="width: 100%; font-size: 9.5pt; margin-top: 4px; margin-bottom: 6px;">
+            <table class="client-info-table">
                 <tr>
-                    <td style="width: 60%; vertical-align: top;">
+                    <td style="width: 58%;">
                         <strong>M/S. {{ project.company_name }}</strong><br>
-                        <strong>{{ project.location }}</strong><br>
-                        <strong>Attn:.: {{ project.attn }}</strong><br>
-                        <strong>Yr. reference : {{ project.yr_ref or '' }}</strong>
+                        <span>{{ project.location }}</span><br>
+                        <span>Attn:.: {{ project.attn }}</span><br>
+                        <span>Yr. reference : {{ project.yr_ref or '' }}</span>
                     </td>
-                    <td style="width: 40%; vertical-align: top; text-align: right;">
+                    <td style="width: 42%; text-align: right;">
                         <strong>Date: {{ project.quotation_date }}</strong><br>
                         <strong>Our Ref : {{ project.quotation_ref }}</strong>
                     </td>
@@ -180,90 +215,91 @@
             </table>
 
             <!-- Subject & Note -->
-            <div style="font-size: 9.5pt; margin-bottom: 3px;">
+            <div style="font-size: 9.5pt; margin-bottom: 2px;">
                 <strong>Sub:   {{ project.subject }}</strong>
             </div>
-            <div style="font-size: 9pt; margin-bottom: 6px; color: #222;">
+            <div style="font-size: 8.5pt; margin-bottom: 3.5mm; color: #222;">
                 {{ project.intro_note }}
             </div>
 
-            <!-- Quotation Table -->
+            <!-- Quotation Table (Matches 7 Columns from PDF) -->
             <table class="quote-table">
                 <thead>
                     <tr>
-                        <th style="width: 6%;">SL</th>
-                        <th style="width: 42%; text-align: left;">Item Description</th>
-                        <th style="width: 9%;">Unit</th>
+                        <th style="width: 5.5%;">SL</th>
+                        <th style="width: 34%; text-align: left;">Item Description</th>
+                        <th style="width: 8.5%;">Unit</th>
                         <th style="width: 10%;">Qty</th>
-                        <th style="width: 15%; text-align: right;">Unit Rate<br>(SR)</th>
-                        <th style="width: 18%; text-align: right;">Amount<br>(SR)</th>
+                        <th style="width: 13%; text-align: right;">Unit Rate<br>(SR)</th>
+                        <th style="width: 15%; text-align: right;">Amount<br>(SR)</th>
+                        <th style="width: 14%;">Remarks</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for item in items %}
                     <tr>
-                        <td class="text-center fw-bold">{{ loop.index }}</td>
-                        <td class="fw-bold">{{ item.desc }}</td>
+                        <td class="text-center">{{ loop.index }}</td>
+                        <td><strong>{{ item.desc }}</strong></td>
                         <td class="text-center">{{ item.unit }}</td>
-                        <td class="text-center fw-bold">{{ "{:,.0f}".format(item.qty) if item.qty.is_integer() else "{:,.2f}".format(item.qty) }}</td>
-                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.rate) }}</td>
-                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.amount) }}</td>
+                        <td class="text-center fw-bold">{{ "{:,.0f}".format(item.qty|float) if (item.qty|float).is_integer() else "{:,.2f}".format(item.qty|float) }}</td>
+                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.rate|float) }}</td>
+                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.amount|float) }}</td>
+                        <td class="text-center">{{ item.remarks or '' }}</td>
                     </tr>
                     {% endfor %}
 
                     <!-- Total SR -->
                     <tr>
-                        <td colspan="4" style="border: none;"></td>
-                        <td class="totals-label">Total SR</td>
-                        <td class="totals-val">{{ "{:,.2f}".format(project.subtotal) }}</td>
+                        <td colspan="3" style="border: none;"></td>
+                        <td colspan="2" class="totals-label">Total   SR</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.subtotal|float) }}</td>
+                        <td style="border: none;"></td>
                     </tr>
                     <!-- VAT@15% -->
                     <tr>
-                        <td colspan="4" style="border: none;"></td>
-                        <td class="totals-label">VAT@15%</td>
-                        <td class="totals-val">{{ "{:,.2f}".format(project.vat_amount) }}</td>
+                        <td colspan="3" style="border: none;"></td>
+                        <td colspan="2" class="totals-label">VAT@15%</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.vat_amount|float) }}</td>
+                        <td style="border: none;"></td>
                     </tr>
                     <!-- Grand Total -->
                     <tr>
-                        <td colspan="4" style="border: none;"></td>
-                        <td class="totals-label">Grand Total</td>
-                        <td class="totals-val">{{ "{:,.2f}".format(project.grand_total) }}</td>
+                        <td colspan="3" style="border: none;"></td>
+                        <td colspan="2" class="totals-label">Grand Total</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.grand_total|float) }}</td>
+                        <td style="border: none;"></td>
                     </tr>
                 </tbody>
             </table>
         </div>
 
-        <!-- Footer Banner -->
-        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
+        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Footer">
     </div>
 
     <!-- ================= PAGE 2 ================= -->
     <div class="sheet">
+        <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Header">
         <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
 
         <div class="content-layer">
-            <!-- Header Banner -->
-            <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
+            <!-- Terms & Conditions Heading -->
+            <div style="margin-bottom: 3mm;">
+                <span style="font-size: 9.5pt; font-weight: bold; text-decoration: underline;">Terms & Conditions</span>
+            </div>
 
-            <!-- Top spacing for Page 2 content (NO Date or Ref box here) -->
-            <div style="height: 10mm;"></div>
-
-            <!-- Terms & Conditions -->
-            <div class="mb-4">
-                <h6 class="fw-bold text-decoration-underline mb-2">Terms & Conditions</h6>
-                <div style="font-size: 9.5pt; line-height: 1.7;">
-                    {% if project.terms_conditions %}
-                        {% for line in project.terms_conditions.split('\n') %}
-                            {% if line.strip() %}
-                                <div><strong>{{ line.strip() }}</strong></div>
-                            {% endif %}
-                        {% endfor %}
-                    {% endif %}
-                </div>
+            <!-- Terms & Conditions List -->
+            <div style="font-size: 8.5pt; line-height: 1.6; margin-bottom: 4mm;">
+                {% if project.terms_conditions %}
+                    {% for line in project.terms_conditions.split('\n') %}
+                        {% if line.strip() %}
+                            <div><strong>{{ line.strip() }}</strong></div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
             </div>
 
             <!-- Bank Details -->
-            <div class="mb-4" style="font-size: 9.5pt; line-height: 1.7;">
+            <div style="font-size: 8.5pt; line-height: 1.6; margin-bottom: 5mm;">
                 {% if project.bank_details %}
                     {% for line in project.bank_details.split('\n') %}
                         {% if line.strip() %}
@@ -273,21 +309,20 @@
                 {% endif %}
             </div>
 
-            <p style="font-size: 9pt; margin-top: 25px;">
+            <p style="font-size: 8.5pt; margin-bottom: 6mm; color: #222;">
                 Should you require any further information, Please do not hesitate contact us, It will be a pleasure to discuss it
             </p>
 
-            <div style="margin-top: 30px; font-size: 9.5pt;">
+            <div style="font-size: 9pt;">
                 <div>Thank You and Best regards,</div>
-                <div class="mt-4">
+                <div style="margin-top: 15px;">
                     <strong>{{ project.signatory_name or 'Mohamed Faizal' }}</strong><br>
                     <strong>{{ project.signatory_title or 'Rawaiya AL Etihad Est.' }}</strong>
                 </div>
             </div>
         </div>
 
-        <!-- Footer Banner -->
-        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
+        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Footer">
     </div>
 
 </body>
