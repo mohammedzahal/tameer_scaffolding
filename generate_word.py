@@ -32,13 +32,33 @@ def format_num(val):
     except:
         return str(val)
 
+def find_template():
+    candidates = [
+        TEMPLATE_PATH,
+        os.path.join(os.getcwd(), 'assets', 'quotation_template.docx'),
+        os.path.join(os.path.dirname(BASE_DIR), 'assets', 'quotation_template.docx'),
+        FALLBACK_LOCAL_PATH,
+    ]
+    for c in candidates:
+        if c and os.path.exists(c):
+            return c
+    return None
+
 def build_quote_word(quote_data):
     """
     Builds a Word document (.docx) using standardized Arial typography and official Tameer layout.
+    Gracefully falls back to a dynamic document generator if the template is not found or unreadable.
     """
-    target_template = TEMPLATE_PATH if os.path.exists(TEMPLATE_PATH) else FALLBACK_LOCAL_PATH
-    if not os.path.exists(target_template):
-        raise FileNotFoundError(f"Quotation Word template not found at {TEMPLATE_PATH} or {FALLBACK_LOCAL_PATH}")
+    target_template = find_template()
+    if target_template:
+        try:
+            return _build_from_template(target_template, quote_data)
+        except Exception as e:
+            print(f"Notice: Failed to build from template ({e}). Using dynamic generator fallback.")
+
+    return _build_dynamically(quote_data)
+
+def _build_from_template(target_template, quote_data):
     doc = docx.Document(target_template)
 
     company_name = quote_data.get('company_name', '')
@@ -247,3 +267,166 @@ def build_quote_word(quote_data):
     doc.save(output_stream)
     output_stream.seek(0)
     return output_stream
+
+def _build_dynamically(quote_data):
+    """
+    Dynamically generates the quotation document from scratch if no template is available.
+    Ensures zero downtime and guaranteed successful downloads on any environment.
+    """
+    doc = docx.Document()
+
+    # Set 0.75-inch page margins
+    for section in doc.sections:
+        section.top_margin = Inches(0.75)
+        section.bottom_margin = Inches(0.75)
+        section.left_margin = Inches(0.75)
+        section.right_margin = Inches(0.75)
+
+    company_name = quote_data.get('company_name', '')
+    location = quote_data.get('location', 'Kingdom of Saudi Arabia')
+    attn = quote_data.get('attn', '')
+    yr_ref = quote_data.get('yr_ref', '')
+    quotation_ref = quote_data.get('quotation_ref', 'TMR-FZ-1748-55471-2026')
+    quotation_date = quote_data.get('quotation_date', '')
+    subject = quote_data.get('subject', 'Scaffolding Materials on sale basis(Used and Refurbed materials)')
+    intro_note = quote_data.get('intro_note', 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:')
+    items = quote_data.get('items', [])
+    subtotal = float(quote_data.get('subtotal', 0.0))
+    vat_amount = float(quote_data.get('vat_amount', 0.0))
+    grand_total = float(quote_data.get('grand_total', 0.0))
+
+    # Header / Title
+    p_title = doc.add_paragraph()
+    r_title = p_title.add_run("TAMEER SCAFFOLDING & FORMWORK")
+    set_run_font(r_title, STANDARD_FONT, 14.0, bold=True)
+    p_title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    # Meta Info: Date and Ref
+    meta_table = doc.add_table(rows=1, cols=2)
+    meta_table.autofit = True
+    c0 = meta_table.cell(0, 0)
+    c1 = meta_table.cell(0, 1)
+    p_ref = c0.paragraphs[0]
+    r_ref = p_ref.add_run(f"Our Ref: {quotation_ref}")
+    set_run_font(r_ref, STANDARD_FONT, 9.5, bold=True)
+    p_date = c1.paragraphs[0]
+    p_date.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    r_date = p_date.add_run(f"Date: {quotation_date}")
+    set_run_font(r_date, STANDARD_FONT, 9.5, bold=True)
+
+    # Client Details
+    p = doc.add_paragraph()
+    r = p.add_run(f"M/S. {company_name}")
+    set_run_font(r, STANDARD_FONT, 10.0, bold=True)
+
+    p = doc.add_paragraph()
+    r = p.add_run(location)
+    set_run_font(r, STANDARD_FONT, 9.5, bold=True)
+
+    p = doc.add_paragraph()
+    r = p.add_run(f"Attn:.: {attn}")
+    set_run_font(r, STANDARD_FONT, 9.5, bold=True)
+
+    p = doc.add_paragraph()
+    r = p.add_run(f"Yr. reference : {yr_ref}" if yr_ref else "Yr. reference : ")
+    set_run_font(r, STANDARD_FONT, 9.5, bold=True)
+
+    p = doc.add_paragraph()
+    r = p.add_run(f"Sub:   {subject}")
+    set_run_font(r, STANDARD_FONT, 10.0, bold=True)
+
+    p = doc.add_paragraph()
+    r = p.add_run(intro_note)
+    set_run_font(r, STANDARD_FONT, 9.5, bold=False)
+
+    # Items Table
+    table = doc.add_table(rows=1 + len(items) + 3, cols=7)
+    table.style = 'Table Grid'
+
+    headers = ["Sl No.", "Description", "Unit", "Qty", "Unit Rate (SAR)", "Total Amount (SAR)", "Remarks"]
+    for i, h in enumerate(headers):
+        cell = table.cell(0, i)
+        cell.text = h
+        if cell.paragraphs and cell.paragraphs[0].runs:
+            set_run_font(cell.paragraphs[0].runs[0], STANDARD_FONT, 9.0, bold=True)
+            cell.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+    def format_cell(cell, text, size=9.5, bold=False, align=WD_ALIGN_PARAGRAPH.LEFT):
+        cell.text = str(text)
+        if cell.paragraphs:
+            p = cell.paragraphs[0]
+            p.alignment = align
+            if p.runs:
+                set_run_font(p.runs[0], STANDARD_FONT, size, bold=bold)
+
+    for idx, item in enumerate(items):
+        r = table.rows[idx + 1]
+        format_cell(r.cells[0], str(item.get('sl', idx + 1)), size=9.0, bold=True, align=WD_ALIGN_PARAGRAPH.CENTER)
+        format_cell(r.cells[1], item.get('desc', ''), size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.LEFT)
+        format_cell(r.cells[2], item.get('unit', 'Pcs.'), size=9.0, bold=False, align=WD_ALIGN_PARAGRAPH.CENTER)
+        format_cell(r.cells[3], f"{item.get('qty', 0):,}", size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+        format_cell(r.cells[4], format_num(item.get('rate', 0.0)), size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+        format_cell(r.cells[5], format_num(item.get('amount', 0.0)), size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+        format_cell(r.cells[6], item.get('remarks', ''), size=8.5, bold=False, align=WD_ALIGN_PARAGRAPH.LEFT)
+
+    # Totals Rows
+    r_sub = table.rows[-3]
+    format_cell(r_sub.cells[4], "Total", size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+    format_cell(r_sub.cells[5], format_num(subtotal), size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+
+    r_vat = table.rows[-2]
+    format_cell(r_vat.cells[4], "15% VAT", size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+    format_cell(r_vat.cells[5], format_num(vat_amount), size=9.5, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+
+    r_tot = table.rows[-1]
+    format_cell(r_tot.cells[4], "Grand Total", size=10.0, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+    format_cell(r_tot.cells[5], format_num(grand_total), size=10.0, bold=True, align=WD_ALIGN_PARAGRAPH.RIGHT)
+
+    # Terms & Conditions on Page 2
+    doc.add_page_break()
+    p_terms_head = doc.add_paragraph()
+    r = p_terms_head.add_run("Terms & Conditions:")
+    r.underline = True
+    set_run_font(r, STANDARD_FONT, 10.5, bold=True)
+
+    terms = quote_data.get('terms_conditions', '')
+    if isinstance(terms, list):
+        terms_lines = terms
+    else:
+        terms_lines = [line.strip() for line in terms.split('\n') if line.strip()]
+
+    for t_line in terms_lines:
+        p_t = doc.add_paragraph()
+        clean_text = re.sub(r'^\s*(\d+[\.\)]\s*)+', '', t_line)
+        r_t = p_t.add_run(clean_text)
+        set_run_font(r_t, STANDARD_FONT, 9.5, bold=False)
+
+    # Bank Details
+    bank_text = quote_data.get('bank_details', '')
+    if bank_text:
+        doc.add_paragraph()
+        for b_line in bank_text.split('\n'):
+            if b_line.strip():
+                p_b = doc.add_paragraph()
+                r_b = p_b.add_run(b_line.strip())
+                set_run_font(r_b, STANDARD_FONT, 9.5, bold=True)
+
+    # Signatory
+    doc.add_paragraph()
+    p_close = doc.add_paragraph()
+    r_close = p_close.add_run("Should you require any further clarifications, please feel free to contact us.\n\nThank You and Best regards,")
+    set_run_font(r_close, STANDARD_FONT, 9.5, bold=False)
+
+    p_sig = doc.add_paragraph()
+    sig_name = quote_data.get('signatory_name', 'Mohamed Faizal')
+    sig_title = quote_data.get('signatory_title', 'Rawaiya AL Etihad Est.')
+    r_sig1 = p_sig.add_run(f"\n{sig_name}\n")
+    set_run_font(r_sig1, STANDARD_FONT, 10.0, bold=True)
+    r_sig2 = p_sig.add_run(sig_title)
+    set_run_font(r_sig2, STANDARD_FONT, 9.5, bold=True)
+
+    output_stream = io.BytesIO()
+    doc.save(output_stream)
+    output_stream.seek(0)
+    return output_stream
+

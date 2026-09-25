@@ -176,72 +176,90 @@ def save_quote(project_id):
 # --- EXPORT & DOWNLOAD ROUTES ---
 @app.route('/download_word/<int:project_id>')
 def download_word(project_id):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
-    row = cursor.fetchone()
-    conn.close()
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
+        row = cursor.fetchone()
+        conn.close()
 
-    if not row:
-        return "Quotation not found", 404
+        if not row:
+            flash("Quotation not found.", "danger")
+            return redirect(url_for('home'))
 
-    quote_data = get_project_dict(row)
-    docx_buf = build_quote_word(quote_data)
-    ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
-    filename = f"Quotation_{ref_safe}.docx"
+        quote_data = get_project_dict(row)
+        docx_buf = build_quote_word(quote_data)
+        ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
+        filename = f"Quotation_{ref_safe}.docx"
 
-    return send_file(
-        docx_buf,
-        download_name=filename,
-        as_attachment=True,
-        mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    )
+        return send_file(
+            docx_buf,
+            download_name=filename,
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        )
+    except Exception as e:
+        app.logger.error(f"Error generating Word file for project {project_id}: {e}", exc_info=True)
+        flash(f"Could not generate Word document: {str(e)}", "danger")
+        return redirect(url_for('home'))
 
 @app.route('/download_excel/<int:project_id>')
 def download_excel(project_id):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
-    row = cursor.fetchone()
-    conn.close()
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
+        row = cursor.fetchone()
+        conn.close()
 
-    if not row:
-        return "Quotation not found", 404
+        if not row:
+            flash("Quotation not found.", "danger")
+            return redirect(url_for('home'))
 
-    quote_data = get_project_dict(row)
-    xlsx_buf = build_quote_excel(quote_data)
-    ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
-    filename = f"Quotation_{ref_safe}.xlsx"
+        quote_data = get_project_dict(row)
+        xlsx_buf = build_quote_excel(quote_data)
+        ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
+        filename = f"Quotation_{ref_safe}.xlsx"
 
-    return send_file(
-        xlsx_buf,
-        download_name=filename,
-        as_attachment=True,
-        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    )
+        return send_file(
+            xlsx_buf,
+            download_name=filename,
+            as_attachment=True,
+            mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
+    except Exception as e:
+        app.logger.error(f"Error generating Excel file for project {project_id}: {e}", exc_info=True)
+        flash(f"Could not generate Excel spreadsheet: {str(e)}", "danger")
+        return redirect(url_for('home'))
 
 @app.route('/download_pdf/<int:project_id>')
 def download_pdf(project_id):
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
-    row = cursor.fetchone()
-    conn.close()
+    try:
+        conn = get_db()
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM Projects WHERE project_id = ?', (project_id,))
+        row = cursor.fetchone()
+        conn.close()
 
-    if not row:
-        return "Quotation not found", 404
+        if not row:
+            flash("Quotation not found.", "danger")
+            return redirect(url_for('home'))
 
-    quote_data = get_project_dict(row)
-    pdf_buf = build_quote_pdf(quote_data)
-    ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
-    filename = f"Quotation_{ref_safe}.pdf"
+        quote_data = get_project_dict(row)
+        pdf_buf = build_quote_pdf(quote_data)
+        ref_safe = (quote_data.get('quotation_ref') or f"Q{project_id}").replace('/', '-').replace(' ', '_')
+        filename = f"Quotation_{ref_safe}.pdf"
 
-    return send_file(
-        pdf_buf,
-        download_name=filename,
-        as_attachment=True,
-        mimetype='application/pdf'
-    )
+        return send_file(
+            pdf_buf,
+            download_name=filename,
+            as_attachment=True,
+            mimetype='application/pdf'
+        )
+    except Exception as e:
+        app.logger.error(f"Error generating PDF file for project {project_id}: {e}", exc_info=True)
+        flash(f"Could not generate PDF document: {str(e)}", "danger")
+        return redirect(url_for('home'))
 
 @app.route('/print_quote/<int:project_id>')
 def print_quote(project_id):
