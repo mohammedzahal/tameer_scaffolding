@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Quotations & Leads | TAMEER Scaffolding{% endblock %}
+
+{% block content %}
+<div class="container-xl px-4">
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show border-0 shadow-sm py-2 px-3 mb-3 small" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Top Minimal Metrics -->
+    <div class="mini-card p-3 mb-4">
+        <div class="row g-3 text-center text-sm-start divide-x">
+            <div class="col-sm-4 border-end-sm">
+                <div class="px-2">
+                    <span class="metric-label">Pending Inquiries</span>
+                    <div class="metric-value">{{ active_leads_count }}</div>
+                </div>
+            </div>
+            <div class="col-sm-4 border-end-sm">
+                <div class="px-2">
+                    <span class="metric-label">Quotes Submitted</span>
+                    <div class="metric-value text-success">{{ quotes_sent_count }}</div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="px-2">
+                    <span class="metric-label">Total Quoted Value</span>
+                    <div class="metric-value text-dark" style="color: var(--tmr-primary) !important;">
+                        SAR {{ "{:,.2f}".format(total_pipeline_val) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Quotations View -->
+    <div class="mini-card overflow-hidden">
+        <!-- Table Toolbar -->
+        <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-3 bg-white">
+            <!-- Filter Tabs -->
+            <ul class="nav nav-pills nav-pills-tmr bg-light p-1 rounded-3" id="quoteTabs">
+                <li class="nav-item">
+                    <button class="nav-link active" onclick="filterByTab('all', this)">
+                        All ({{ (leads|length) + (quotes_sent|length) }})
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filterByTab('sent', this)">
+                        Quotes Sent ({{ quotes_sent|length }})
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" onclick="filterByTab('lead', this)">
+                        Pending ({{ leads|length }})
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Search input -->
+            <div class="input-group input-group-sm" style="max-width: 280px;">
+                <span class="input-group-text bg-light border-end-0 text-muted"><i class="bi bi-search"></i></span>
+                <input type="text" id="quoteSearchInput" class="form-control border-start-0 bg-light" 
+                       placeholder="Search quotation or client..." oninput="filterQuotesTable()">
+            </div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-responsive">
+            <table class="clean-table" id="quotesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Client / Company</th>
+                        <th style="width: 15%;">Reference</th>
+                        <th style="width: 15%;">Date</th>
+                        <th style="width: 15%;" class="text-end">Amount (SAR)</th>
+                        <th style="width: 12%;" class="text-center">Status</th>
+                        <th style="width: 18%;" class="text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- All Projects (Sent and Leads) -->
+                    {% set all_projects = quotes_sent + leads %}
+                    {% if all_projects %}
+                        {% for project in all_projects %}
+                        <tr class="quote-row" data-status="{{ 'sent' if project.project_status == 'Quote Sent' else 'lead' }}"
+                            data-search="{{ project.company_name|lower }} {{ project.quotation_ref|lower }} {{ project.attn|lower }}">
+                            <td>
+                                <div class="fw-semibold text-dark">{{ project.company_name }}</div>
+                                <div class="text-muted small">
+                                    {{ project.attn or 'N/A' }} {% if project.location %}• {{ project.location }}{% endif %}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="fw-semibold text-secondary font-monospace" style="font-size: 0.82rem;">
+                                    {{ project.quotation_ref or '-' }}
+                                </span>
+                            </td>
+                            <td class="text-muted small">
+                                {{ project.quotation_date or 'Recent' }}
+                            </td>
+                            <td class="text-end">
+                                {% if project.grand_total and project.grand_total > 0 %}
+                                    <span class="fw-bold text-dark">SAR {{ "{:,.2f}".format(project.grand_total) }}</span>
+                                {% else %}
+                                    <span class="text-muted small">Not Calculated</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                {% if project.project_status == 'Quote Sent' %}
+                                    <span class="badge-sent">Quote Sent</span>
+                                {% else %}
+                                    <span class="badge-lead">Pending Lead</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex align-items-center gap-1">
+                                    <a href="{{ url_for('quote_builder', project_id=project.project_id) }}" 
+                                       class="btn btn-secondary-tmr btn-sm py-1 px-2" title="Edit / Open Quote">
+                                        <i class="bi bi-pencil"></i>
+                                        <span>Edit</span>
+                                    </a>
+
+                                    {% if project.project_status == 'Quote Sent' or project.grand_total > 0 %}
+                                    <div class="dropdown">
+                                        <button class="icon-action-btn" type="button" data-bs-toggle="dropdown" title="Export Quotation">
+                                            <i class="bi bi-download"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="font-size: 0.85rem; border-radius: 8px;">
+                                            <li>
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_pdf', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-pdf text-danger"></i> PDF (.pdf)
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_word', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-word text-primary"></i> Word (.docx)
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_excel', project_id=project.project_id) }}">
+                                                    <i class="bi bi-file-earmark-excel text-success"></i> Excel (.xlsx)
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider my-1"></li>
+                                            <li>
+                                                <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('print_quote', project_id=project.project_id) }}" target="_blank">
+                                                    <i class="bi bi-printer text-dark"></i> Print View
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+
+                                    <form action="{{ url_for('delete_project', project_id=project.project_id) }}" method="POST" 
+                                          class="d-inline" onsubmit="return confirm('Delete this quotation record?');">
+                                        <button type="submit" class="icon-action-btn danger" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <div class="mb-2"><i class="bi bi-file-earmark-text fs-2 opacity-50"></i></div>
+                                <div class="fw-semibold">No quotations found</div>
+                                <small>Click "New Quote" above to create your first quotation.</small>
+                            </td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    let currentTab = 'all';
+
+    function filterByTab(tab, btn) {
+        currentTab = tab;
+        document.querySelectorAll("#quoteTabs .nav-link").forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        filterQuotesTable();
+    }
+
+    function filterQuotesTable() {
+        const query = (document.getElementById("quoteSearchInput")?.value || "").toLowerCase().trim();
+        const rows = document.querySelectorAll(".quote-row");
+
+        rows.forEach(r => {
+            const status = r.getAttribute("data-status");
+            const searchData = r.getAttribute("data-search") || "";
+
+            const matchesTab = (currentTab === 'all') || (status === currentTab);
+            const matchesSearch = !query || searchData.includes(query);
+
+            if (matchesTab && matchesSearch) {
+                r.style.display = "";
+            } else {
+                r.style.display = "none";
+            }
+        });
+    }
+</script>
+{% endblock %}

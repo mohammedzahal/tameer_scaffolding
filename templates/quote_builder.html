@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% set active_page = "dashboard" %}
+
+{% block title %}Quotation: {{ project.company_name }} | TAMEER{% endblock %}
+
+{% block content %}
+<div class="container-xl px-4 pb-5">
+
+    <!-- Top Navigation & Action Header -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary-tmr btn-sm" title="Back to Quotations">
+                <i class="bi bi-arrow-left"></i>
+            </a>
+            <div>
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="fw-bold text-dark mb-0">{{ project.company_name }}</h5>
+                    {% if project.project_status == 'Quote Sent' %}
+                        <span class="badge-sent">Quote Sent</span>
+                    {% else %}
+                        <span class="badge-lead">Draft Lead</span>
+                    {% endif %}
+                </div>
+                <small class="text-muted">Ref: <strong>{{ project.quotation_ref }}</strong> • {{ project.quotation_date or current_date }}</small>
+            </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+            {% if project.project_status == 'Quote Sent' or project.grand_total > 0 %}
+                <div class="dropdown">
+                    <button class="btn btn-secondary-tmr dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="bi bi-download me-1"></i> Export
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 py-1" style="border-radius: 8px;">
+                        <li>
+                            <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_pdf', project_id=project.project_id) }}">
+                                <i class="bi bi-file-earmark-pdf text-danger"></i> PDF (.pdf)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_word', project_id=project.project_id) }}">
+                                <i class="bi bi-file-earmark-word text-primary"></i> Word (.docx)
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('download_excel', project_id=project.project_id) }}">
+                                <i class="bi bi-file-earmark-excel text-success"></i> Excel (.xlsx)
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li>
+                            <a class="dropdown-item py-1 px-3 d-flex align-items-center gap-2" href="{{ url_for('print_quote', project_id=project.project_id) }}" target="_blank">
+                                <i class="bi bi-printer text-dark"></i> Print View
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            {% endif %}
+
+            <button type="button" class="btn btn-primary-tmr" onclick="document.getElementById('quoteForm').submit();">
+                <i class="bi bi-check2"></i>
+                <span>Save & Calculate</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN FORM -->
+    <form id="quoteForm" action="{{ url_for('save_quote', project_id=project.project_id) }}" method="POST">
+        <!-- Hidden Inputs for JS calculations -->
+        <input type="hidden" name="subtotal" id="hiddenSubtotal" value="{{ project.subtotal or 0.0 }}">
+        <input type="hidden" name="vat_amount" id="hiddenVat" value="{{ project.vat_amount or 0.0 }}">
+        <input type="hidden" name="grand_total" id="hiddenGrandTotal" value="{{ project.grand_total or 0.0 }}">
+        <input type="hidden" name="items_json" id="hiddenItemsJson" value='{{ project.items_json or "[]" }}'>
+
+        <!-- SECTION 1: COMPACT CLIENT & QUOTE DETAILS -->
+        <div class="mini-card p-3 mb-4">
+            <div class="row g-2">
+                <div class="col-md-3">
+                    <label class="form-label">Client / Contractor *</label>
+                    <input type="text" class="form-control" name="company_name" value="{{ project.company_name }}" required>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Location / City *</label>
+                    <input type="text" class="form-control" name="location" value="{{ project.location or 'Jubail, Kingdom of Saudi Arabia' }}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Attn (Contact Person)</label>
+                    <input type="text" class="form-control" name="attn" value="{{ project.attn or 'Mr. Ahmed Masood' }}">
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Quotation Ref *</label>
+                    <input type="text" class="form-control font-monospace" name="quotation_ref" value="{{ project.quotation_ref or default_ref }}" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Date *</label>
+                    <input type="text" class="form-control" name="quotation_date" value="{{ project.quotation_date or current_date }}" required>
+                </div>
+
+                <div class="col-md-6 mt-2">
+                    <label class="form-label">Subject *</label>
+                    <input type="text" class="form-control" name="subject" value="{{ project.subject or 'Scaffolding Materials on sale basis(Used and Refurbed materials)' }}" required>
+                </div>
+                <div class="col-md-4 mt-2">
+                    <label class="form-label">Inquiry / Note</label>
+                    <input type="text" class="form-control" name="intro_note" value="{{ project.intro_note or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:' }}" required>
+                </div>
+                <div class="col-md-2 mt-2">
+                    <label class="form-label">Client Yr. Ref</label>
+                    <input type="text" class="form-control" name="yr_ref" value="{{ project.yr_ref or '' }}" placeholder="Optional">
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: ITEMS TABLE -->
+        <div class="mini-card overflow-hidden mb-4">
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center bg-white">
+                <span class="fw-bold text-dark" style="font-size: 0.95rem;">Scaffolding Components & Quantities</span>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-secondary-tmr btn-sm" data-bs-toggle="modal" data-bs-target="#catalogModal" onclick="filterCatalog()">
+                        <i class="bi bi-search"></i>
+                        <span>Browse 136 Catalog</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary-tmr btn-sm" onclick="addEmptyRow()">
+                        <i class="bi bi-plus-lg"></i>
+                        <span>Add Row</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="clean-table builder-table" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 45px;" class="text-center">#</th>
+                            <th style="min-width: 280px;">Component Description (Type to search 136 items)</th>
+                            <th style="width: 90px;" class="text-center">Unit</th>
+                            <th style="width: 100px;" class="text-end">Qty</th>
+                            <th style="width: 120px;" class="text-end">Rate (SAR)</th>
+                            <th style="width: 130px;" class="text-end">Amount (SAR)</th>
+                            <th style="min-width: 140px;">Remarks</th>
+                            <th style="width: 45px;" class="text-center"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsTableBody">
+                        <!-- Populated dynamically via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer Toolbar and Totals -->
+            <div class="p-3 bg-white border-top">
+                <div class="row align-items-center">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <button type="button" class="btn btn-secondary-tmr btn-sm" onclick="addEmptyRow()">
+                            <i class="bi bi-plus-lg"></i> Add Line Item
+                        </button>
+                        <small class="text-muted ms-2">Start typing in description to auto-select from 136 items.</small>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="totals-summary-box ms-auto" style="max-width: 360px;">
+                            <div class="d-flex justify-content-between mb-1" style="font-size: 0.85rem;">
+                                <span class="text-muted">Total (Subtotal):</span>
+                                <span class="fw-semibold text-dark" id="summarySubtotal">SAR 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2" style="font-size: 0.85rem;">
+                                <span class="text-muted">VAT (15%):</span>
+                                <span class="fw-semibold text-dark" id="summaryVat">SAR 0.00</span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top align-items-baseline">
+                                <span class="fw-bold text-dark" style="font-size: 0.95rem;">Grand Total:</span>
+                                <span class="fw-bold fs-5" style="color: var(--tmr-primary);" id="summaryGrandTotal">SAR 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: COLLAPSIBLE TERMS & BANKING -->
+        <div class="mini-card overflow-hidden mb-4">
+            <a class="p-3 d-flex justify-content-between align-items-center text-decoration-none text-dark bg-white" 
+               data-bs-toggle="collapse" href="#termsCollapse" role="button" aria-expanded="false">
+                <span class="fw-semibold" style="font-size: 0.9rem;">
+                    <i class="bi bi-sliders me-1 text-muted"></i> Terms & Conditions, Banking & Signatory
+                </span>
+                <span class="text-muted small"><i class="bi bi-chevron-down"></i> Click to edit</span>
+            </a>
+
+            <div class="collapse" id="termsCollapse">
+                <div class="p-3 border-top bg-light">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Terms & Conditions</label>
+                            <textarea class="form-control" name="terms_conditions" rows="4" style="font-size: 0.85rem;">{{ project.terms_conditions or default_terms }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Banking Details</label>
+                            <textarea class="form-control" name="bank_details" rows="4" style="font-size: 0.85rem;">{{ project.bank_details or default_bank_details }}</textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Signatory Name</label>
+                            <input type="text" class="form-control form-control-sm" name="signatory_name" value="{{ project.signatory_name or default_signatory }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Signatory Title</label>
+                            <input type="text" class="form-control form-control-sm" name="signatory_title" value="{{ project.signatory_title or default_signatory_title }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Save button at bottom -->
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('home') }}" class="btn btn-secondary-tmr">Cancel</a>
+            <button type="submit" class="btn btn-primary-tmr px-4">
+                <i class="bi bi-check2"></i> Save Quotation
+            </button>
+        </div>
+
+    </form>
+
+</div>
+
+<!-- MINIMAL CATALOG MODAL -->
+<div class="modal fade" id="catalogModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-sm" style="border-radius: 12px;">
+            <div class="modal-header border-bottom px-4 py-3">
+                <h6 class="modal-title fw-bold text-dark">Scaffolding Components (136 Items)</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-3">
+                <div class="row g-2 mb-3">
+                    <div class="col-md-7">
+                        <input type="text" id="catalogSearchInput" class="form-control form-control-sm" 
+                               placeholder="Search component name..." oninput="filterCatalog()">
+                    </div>
+                    <div class="col-md-5">
+                        <select id="catalogCategorySelect" class="form-select form-select-sm" onchange="filterCatalog()">
+                            <!-- Categories populated dynamically -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="list-group list-group-flush border rounded-3" id="catalogItemsList" style="max-height: 380px; overflow-y: auto;">
+                    <!-- Items rendered dynamically -->
+                </div>
+            </div>
+            <div class="modal-footer bg-light px-4 py-2 border-top" style="border-radius: 0 0 12px 12px;">
+                <button type="button" class="btn btn-secondary-tmr btn-sm" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/builder.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        let initialItems = [];
+        try {
+            const rawJson = '{{ project.items_json | safe }}';
+            if (rawJson && rawJson !== 'None' && rawJson !== '[]') {
+                initialItems = JSON.parse(rawJson);
+            }
+        } catch (e) {
+            console.error("Error parsing items_json:", e);
+        }
+
+        if (initialItems && initialItems.length > 0) {
+            initialItems.forEach(item => addRow(item));
+        } else {
+            addRow({ desc: '2.5m Ledger', unit: 'Pcs.', qty: 100, rate: 35.00, remarks: '' });
+            addRow({ desc: '1.8m Ledger', unit: 'Pcs.', qty: 50, rate: 28.00, remarks: '' });
+            addRow({ desc: '3.0m Vertical Standard', unit: 'Pcs.', qty: 50, rate: 64.00, remarks: '' });
+        }
+    });
+</script>
+{% endblock %}

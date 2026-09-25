@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+    --tmr-primary: #8B1E2D;
+    --tmr-primary-hover: #701522;
+    --tmr-primary-subtle: #FDF2F4;
+    --tmr-text-main: #0F172A;
+    --tmr-text-muted: #64748B;
+    --tmr-border: #E2E8F0;
+    --tmr-bg: #F8FAFC;
+    --tmr-card-bg: #FFFFFF;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--tmr-text-main);
+    background-color: var(--tmr-bg);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Minimalist Navbar */
+.app-header {
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--tmr-border);
+}
+
+.brand-badge {
+    background: var(--tmr-primary);
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 3px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.nav-link-custom {
+    color: var(--tmr-text-muted);
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.85rem;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.nav-link-custom:hover {
+    color: var(--tmr-text-main);
+    background: #F1F5F9;
+}
+
+.nav-link-custom.active {
+    color: var(--tmr-primary);
+    background: var(--tmr-primary-subtle);
+    font-weight: 600;
+}
+
+/* Minimal Buttons */
+.btn-primary-tmr {
+    background-color: var(--tmr-primary);
+    border: 1px solid var(--tmr-primary);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-primary-tmr:hover {
+    background-color: var(--tmr-primary-hover);
+    border-color: var(--tmr-primary-hover);
+    color: #FFFFFF;
+}
+
+.btn-secondary-tmr {
+    background: #FFFFFF;
+    border: 1px solid var(--tmr-border);
+    color: var(--tmr-text-main);
+    font-weight: 500;
+    font-size: 0.875rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.btn-secondary-tmr:hover {
+    background: #F8FAFC;
+    border-color: #CBD5E1;
+    color: var(--tmr-text-main);
+}
+
+/* Minimal Cards */
+.mini-card {
+    background: #FFFFFF;
+    border: 1px solid var(--tmr-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+/* Metrics Row */
+.metric-box {
+    padding: 1rem 1.25rem;
+}
+
+.metric-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tmr-text-muted);
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tmr-text-main);
+    margin-top: 0.25rem;
+}
+
+/* Clean Form Controls */
+.form-control, .form-select {
+    border-color: var(--tmr-border);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    color: var(--tmr-text-main);
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--tmr-primary);
+    box-shadow: 0 0 0 3px rgba(139, 30, 45, 0.1);
+}
+
+.form-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 0.35rem;
+}
+
+/* Minimal Tables */
+.clean-table {
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.clean-table thead th {
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--tmr-border);
+    border-top: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tmr-text-muted);
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+}
+
+.clean-table tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+.clean-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+/* Builder Items Table */
+.builder-table thead th {
+    background: #F8FAFC;
+    border-bottom: 1px solid var(--tmr-border);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tmr-text-muted);
+    padding: 0.6rem 0.5rem;
+}
+
+.builder-table tbody td {
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid #F1F5F9;
+    vertical-align: middle;
+}
+
+.builder-table .form-control,
+.builder-table .form-select {
+    padding: 0.35rem 0.5rem;
+    font-size: 0.85rem;
+    border-color: #E2E8F0;
+    background-color: #FFFFFF;
+}
+
+.builder-table .form-control:focus,
+.builder-table .form-select:focus {
+    background-color: #FFFFFF;
+}
+
+/* Autocomplete Dropdown */
+.autocomplete-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #FFFFFF;
+    border: 1px solid var(--tmr-border);
+    border-radius: 8px;
+    max-height: 220px;
+    overflow-y: auto;
+    z-index: 1050;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-suggestion {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    border-bottom: 1px solid #F8FAFC;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.autocomplete-suggestion:hover {
+    background-color: var(--tmr-primary-subtle);
+    color: var(--tmr-primary);
+}
+
+/* Status Badges */
+.badge-lead {
+    background: #F1F5F9;
+    color: #475569;
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+}
+
+.badge-sent {
+    background: #ECFDF5;
+    color: #059669;
+    font-weight: 500;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+}
+
+/* Action Icons */
+.icon-action-btn {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--tmr-text-muted);
+    border: 1px solid transparent;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    background: transparent;
+}
+
+.icon-action-btn:hover {
+    background: #F1F5F9;
+    color: var(--tmr-text-main);
+    border-color: var(--tmr-border);
+}
+
+.icon-action-btn.danger:hover {
+    background: #FEF2F2;
+    color: #DC2626;
+    border-color: #FCA5A5;
+}
+
+/* Totals Box */
+.totals-summary-box {
+    background: #F8FAFC;
+    border: 1px solid var(--tmr-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+}
+
+/* Tabs */
+.nav-pills-tmr .nav-link {
+    color: var(--tmr-text-muted);
+    font-weight: 500;
+    font-size: 0.85rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 6px;
+}
+
+.nav-pills-tmr .nav-link.active {
+    background-color: #FFFFFF;
+    color: var(--tmr-text-main);
+    font-weight: 600;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
