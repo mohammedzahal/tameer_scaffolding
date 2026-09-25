@@ -43,16 +43,21 @@ body {
 }
 
 .brand-emblem-img {
-    height: 40px;
-    width: 40px;
+    height: 54px;
+    width: 54px;
     object-fit: contain;
-    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.14));
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15));
+    transition: transform 0.2s ease;
+}
+
+.brand-link:hover .brand-emblem-img {
+    transform: scale(1.05);
 }
 
 .brand-title {
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    font-size: 1.18rem;
+    font-size: 1.35rem;
     letter-spacing: -0.02em;
     color: #0F172A;
     line-height: 1.1;
@@ -61,12 +66,12 @@ body {
 .brand-sub {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    font-size: 0.65rem;
-    letter-spacing: 0.18em;
+    font-size: 0.72rem;
+    letter-spacing: 0.20em;
     color: #475569;
     text-transform: uppercase;
     line-height: 1;
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
 .nav-link-custom {
@@ -489,3 +494,4 @@ body {
     border-color: #CBD5E1;
     background: #F8FAFC;
 }
+
