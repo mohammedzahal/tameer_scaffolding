@@ -9,11 +9,11 @@
     <style>
         @page {
             size: A4 portrait;
-            margin: 8mm 10mm;
+            margin: 0;
         }
 
         body {
-            background-color: #E2E8F0;
+            background-color: #525659;
             margin: 0;
             padding: 20px 0;
             font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
@@ -25,8 +25,8 @@
             width: 210mm;
             min-height: 297mm;
             margin: 0 auto 20px auto;
-            padding: 10mm 14mm;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            padding: 12mm 15mm;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             position: relative;
             box-sizing: border-box;
             display: flex;
@@ -54,23 +54,23 @@
         .banner-header {
             width: 100%;
             height: auto;
-            max-height: 24mm;
+            max-height: 25mm;
             object-fit: contain;
-            margin-bottom: 3mm;
+            margin-bottom: 4mm;
         }
 
         .banner-footer {
             width: 100%;
             height: auto;
-            max-height: 18mm;
+            max-height: 20mm;
             object-fit: contain;
-            margin-top: 4mm;
+            margin-top: 5mm;
         }
 
         .quote-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8.5pt;
+            font-size: 9pt;
             margin-top: 3mm;
             margin-bottom: 3mm;
         }
@@ -105,55 +105,41 @@
             top: 20px;
             right: 20px;
             background: #FFFFFF;
-            padding: 8px 14px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.22);
+            padding: 10px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             z-index: 9999;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         @media print {
             body {
-                background: #FFFFFF !important;
-                padding: 0 !important;
-                margin: 0 !important;
+                background: none;
+                padding: 0;
             }
             .print-toolbar {
                 display: none !important;
             }
             .sheet {
-                box-shadow: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-                min-height: auto !important;
+                box-shadow: none;
+                margin: 0;
+                width: 100%;
+                min-height: 100vh;
                 page-break-after: always;
-                break-after: page;
             }
             .sheet:last-child {
                 page-break-after: avoid;
-                break-after: avoid;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Floating Action Toolbar with 1-Page / 2-Page Layout Switch -->
+    <!-- Floating Action Toolbar -->
     <div class="print-toolbar no-print">
-        <div class="btn-group btn-group-sm" role="group">
-            <button type="button" id="btn1Page" class="btn {% if items|length <= 6 %}btn-dark{% else %}btn-outline-dark{% endif %} fw-semibold" onclick="setLayout(1)">
-                <i class="bi bi-file-earmark me-1"></i> 1-Page Fit
-            </button>
-            <button type="button" id="btn2Page" class="btn {% if items|length > 6 %}btn-dark{% else %}btn-outline-dark{% endif %} fw-semibold" onclick="setLayout(2)">
-                <i class="bi bi-files me-1"></i> 2-Page Formal
-            </button>
-        </div>
-
-        <button class="btn btn-primary btn-sm fw-bold px-3" onclick="window.print()">
-            <i class="bi bi-printer-fill me-1"></i> Print / PDF
+        <button class="btn btn-primary btn-sm fw-bold" onclick="window.print()">
+            <i class="bi bi-printer-fill me-1"></i> Print / Save as PDF
         </button>
         <a href="{{ url_for('download_word', project_id=project.project_id) }}" class="btn btn-outline-primary btn-sm">
             <i class="bi bi-file-earmark-word-fill me-1"></i> Word
@@ -169,292 +155,140 @@
         </a>
     </div>
 
-    <!-- ================= VIEW 1: 1-PAGE COMPACT FIT (Recommended for <= 6 items) ================= -->
-    <div id="view1Page" class="print-view-container {% if items|length > 6 %}d-none{% endif %}">
-        <div class="sheet">
-            <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
+    <!-- ================= PAGE 1 ================= -->
+    <div class="sheet">
+        <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
 
-            <div class="content-layer">
-                <!-- Header Banner -->
-                <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
+        <div class="content-layer">
+            <!-- Header Banner -->
+            <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
 
-                <!-- Client & Ref Header Table -->
-                <table style="width: 100%; font-size: 9pt; margin-top: 2px; margin-bottom: 4px;">
-                    <tr>
-                        <td style="width: 60%; vertical-align: top;">
-                            <strong>M/S. {{ project.company_name }}</strong><br>
-                            <strong>{{ project.location }}</strong><br>
-                            <strong>Attn:.: {{ project.attn }}</strong><br>
-                            <strong>Yr. reference : {{ project.yr_ref or '' }}</strong>
-                        </td>
-                        <td style="width: 40%; vertical-align: top; text-align: right;">
-                            <strong>Date: {{ project.quotation_date }}</strong><br>
-                            <strong>Our Ref : {{ project.quotation_ref }}</strong>
-                        </td>
-                    </tr>
-                </table>
+            <!-- Client & Ref Header Table -->
+            <table style="width: 100%; font-size: 9.5pt; margin-top: 4px; margin-bottom: 6px;">
+                <tr>
+                    <td style="width: 60%; vertical-align: top;">
+                        <strong>M/S. {{ project.company_name }}</strong><br>
+                        <strong>{{ project.location }}</strong><br>
+                        <strong>Attn:.: {{ project.attn }}</strong><br>
+                        <strong>Yr. reference : {{ project.yr_ref or '' }}</strong>
+                    </td>
+                    <td style="width: 40%; vertical-align: top; text-align: right;">
+                        <strong>Date: {{ project.quotation_date }}</strong><br>
+                        <strong>Our Ref : {{ project.quotation_ref }}</strong>
+                    </td>
+                </tr>
+            </table>
 
-                <!-- Subject & Note -->
-                <div style="font-size: 9pt; margin-bottom: 2px;">
-                    <strong>Sub:   {{ project.subject }}</strong>
-                </div>
-                <div style="font-size: 8.5pt; margin-bottom: 4px; color: #222;">
-                    {{ project.intro_note }}
-                </div>
-
-                <!-- Quotation Table -->
-                <table class="quote-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 6%;">SL</th>
-                            <th style="width: 42%; text-align: left;">Item Description</th>
-                            <th style="width: 9%;">Unit</th>
-                            <th style="width: 10%;">Qty</th>
-                            <th style="width: 15%; text-align: right;">Unit Rate (SR)</th>
-                            <th style="width: 18%; text-align: right;">Amount (SR)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td class="text-center fw-bold">{{ loop.index }}</td>
-                            <td class="fw-bold">{{ item.desc }}</td>
-                            <td class="text-center">{{ item.unit }}</td>
-                            <td class="text-center fw-bold">{{ "{:,.0f}".format(item.qty) if item.qty.is_integer() else "{:,.2f}".format(item.qty) }}</td>
-                            <td class="text-end fw-bold">{{ "{:,.2f}".format(item.rate) }}</td>
-                            <td class="text-end fw-bold">{{ "{:,.2f}".format(item.amount) }}</td>
-                        </tr>
-                        {% endfor %}
-
-                        <!-- Total SR -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">Total SR</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.subtotal) }}</td>
-                        </tr>
-                        <!-- VAT@15% -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">VAT@15%</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.vat_amount) }}</td>
-                        </tr>
-                        <!-- Grand Total -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">Grand Total</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.grand_total) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <!-- Terms, Banking & Signatory side-by-side for 1-Page Fit -->
-                <div style="margin-top: 3mm;">
-                    <div style="display: flex; justify-content: space-between; gap: 16px; margin-bottom: 2mm;">
-                        <!-- Terms (Left Column) -->
-                        <div style="flex: 1.15;">
-                            <div style="font-weight: bold; text-decoration: underline; font-size: 8.5pt; margin-bottom: 2px;">Terms & Conditions</div>
-                            <div style="font-size: 8pt; line-height: 1.45;">
-                                {% if project.terms_conditions %}
-                                    {% for line in project.terms_conditions.split('\n') %}
-                                        {% if line.strip() %}
-                                            <div><strong>{{ line.strip() }}</strong></div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Banking Details (Right Column) -->
-                        <div style="flex: 0.85;">
-                            <div style="font-weight: bold; text-decoration: underline; font-size: 8.5pt; margin-bottom: 2px;">Banking Details</div>
-                            <div style="font-size: 8pt; line-height: 1.45;">
-                                {% if project.bank_details %}
-                                    {% for line in project.bank_details.split('\n') %}
-                                        {% if line.strip() %}
-                                            <div><strong>{{ line.strip() }}</strong></div>
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Closing & Signatory -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; font-size: 8pt; margin-top: 1mm; border-top: 1px dashed #DDD; padding-top: 2px;">
-                        <div style="font-size: 7.5pt; color: #333; max-width: 58%;">
-                            Should you require any further information, please do not hesitate to contact us.
-                        </div>
-                        <div style="text-align: right;">
-                            <div>Thank You and Best regards,</div>
-                            <div style="margin-top: 2px;">
-                                <strong>{{ project.signatory_name or 'Mohamed Faizal' }}</strong><br>
-                                <strong>{{ project.signatory_title or 'Rawaiya AL Etihad Est.' }}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Subject & Note -->
+            <div style="font-size: 9.5pt; margin-bottom: 3px;">
+                <strong>Sub:   {{ project.subject }}</strong>
+            </div>
+            <div style="font-size: 9pt; margin-bottom: 6px; color: #222;">
+                {{ project.intro_note }}
             </div>
 
-            <!-- Footer Banner -->
-            <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
+            <!-- Quotation Table -->
+            <table class="quote-table">
+                <thead>
+                    <tr>
+                        <th style="width: 6%;">SL</th>
+                        <th style="width: 42%; text-align: left;">Item Description</th>
+                        <th style="width: 9%;">Unit</th>
+                        <th style="width: 10%;">Qty</th>
+                        <th style="width: 15%; text-align: right;">Unit Rate<br>(SR)</th>
+                        <th style="width: 18%; text-align: right;">Amount<br>(SR)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td class="text-center fw-bold">{{ loop.index }}</td>
+                        <td class="fw-bold">{{ item.desc }}</td>
+                        <td class="text-center">{{ item.unit }}</td>
+                        <td class="text-center fw-bold">{{ "{:,.0f}".format(item.qty) if item.qty.is_integer() else "{:,.2f}".format(item.qty) }}</td>
+                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.rate) }}</td>
+                        <td class="text-end fw-bold">{{ "{:,.2f}".format(item.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+
+                    <!-- Total SR -->
+                    <tr>
+                        <td colspan="4" style="border: none;"></td>
+                        <td class="totals-label">Total SR</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.subtotal) }}</td>
+                    </tr>
+                    <!-- VAT@15% -->
+                    <tr>
+                        <td colspan="4" style="border: none;"></td>
+                        <td class="totals-label">VAT@15%</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.vat_amount) }}</td>
+                    </tr>
+                    <!-- Grand Total -->
+                    <tr>
+                        <td colspan="4" style="border: none;"></td>
+                        <td class="totals-label">Grand Total</td>
+                        <td class="totals-val">{{ "{:,.2f}".format(project.grand_total) }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+        <!-- Footer Banner -->
+        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
     </div>
 
+    <!-- ================= PAGE 2 ================= -->
+    <div class="sheet">
+        <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
 
-    <!-- ================= VIEW 2: 2-PAGE FORMAL (For large quotes or multi-page) ================= -->
-    <div id="view2Page" class="print-view-container {% if items|length <= 6 %}d-none{% endif %}">
-        <!-- PAGE 1 -->
-        <div class="sheet">
-            <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
+        <div class="content-layer">
+            <!-- Header Banner -->
+            <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
 
-            <div class="content-layer">
-                <!-- Header Banner -->
-                <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
+            <!-- Top spacing for Page 2 content (NO Date or Ref box here) -->
+            <div style="height: 10mm;"></div>
 
-                <!-- Client & Ref Header Table -->
-                <table style="width: 100%; font-size: 9.5pt; margin-top: 4px; margin-bottom: 6px;">
-                    <tr>
-                        <td style="width: 60%; vertical-align: top;">
-                            <strong>M/S. {{ project.company_name }}</strong><br>
-                            <strong>{{ project.location }}</strong><br>
-                            <strong>Attn:.: {{ project.attn }}</strong><br>
-                            <strong>Yr. reference : {{ project.yr_ref or '' }}</strong>
-                        </td>
-                        <td style="width: 40%; vertical-align: top; text-align: right;">
-                            <strong>Date: {{ project.quotation_date }}</strong><br>
-                            <strong>Our Ref : {{ project.quotation_ref }}</strong>
-                        </td>
-                    </tr>
-                </table>
-
-                <!-- Subject & Note -->
-                <div style="font-size: 9.5pt; margin-bottom: 3px;">
-                    <strong>Sub:   {{ project.subject }}</strong>
-                </div>
-                <div style="font-size: 9pt; margin-bottom: 6px; color: #222;">
-                    {{ project.intro_note }}
-                </div>
-
-                <!-- Quotation Table -->
-                <table class="quote-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 6%;">SL</th>
-                            <th style="width: 42%; text-align: left;">Item Description</th>
-                            <th style="width: 9%;">Unit</th>
-                            <th style="width: 10%;">Qty</th>
-                            <th style="width: 15%; text-align: right;">Unit Rate<br>(SR)</th>
-                            <th style="width: 18%; text-align: right;">Amount<br>(SR)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in items %}
-                        <tr>
-                            <td class="text-center fw-bold">{{ loop.index }}</td>
-                            <td class="fw-bold">{{ item.desc }}</td>
-                            <td class="text-center">{{ item.unit }}</td>
-                            <td class="text-center fw-bold">{{ "{:,.0f}".format(item.qty) if item.qty.is_integer() else "{:,.2f}".format(item.qty) }}</td>
-                            <td class="text-end fw-bold">{{ "{:,.2f}".format(item.rate) }}</td>
-                            <td class="text-end fw-bold">{{ "{:,.2f}".format(item.amount) }}</td>
-                        </tr>
-                        {% endfor %}
-
-                        <!-- Total SR -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">Total SR</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.subtotal) }}</td>
-                        </tr>
-                        <!-- VAT@15% -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">VAT@15%</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.vat_amount) }}</td>
-                        </tr>
-                        <!-- Grand Total -->
-                        <tr>
-                            <td colspan="4" style="border: none;"></td>
-                            <td class="totals-label">Grand Total</td>
-                            <td class="totals-val">{{ "{:,.2f}".format(project.grand_total) }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Footer Banner -->
-            <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
-        </div>
-
-        <!-- PAGE 2 -->
-        <div class="sheet">
-            <img src="{{ url_for('static', filename='img/image1.png') }}" class="watermark" alt="Watermark">
-
-            <div class="content-layer">
-                <!-- Header Banner -->
-                <img src="{{ url_for('static', filename='img/image2.jpeg') }}" class="banner-header" alt="Tameer Scaffolding Header">
-
-                <!-- Terms & Conditions -->
-                <div class="mb-4 mt-3">
-                    <h6 class="fw-bold text-decoration-underline mb-2">Terms & Conditions</h6>
-                    <div style="font-size: 9.5pt; line-height: 1.7;">
-                        {% if project.terms_conditions %}
-                            {% for line in project.terms_conditions.split('\n') %}
-                                {% if line.strip() %}
-                                    <div><strong>{{ line.strip() }}</strong></div>
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Bank Details -->
-                <div class="mb-4" style="font-size: 9.5pt; line-height: 1.7;">
-                    {% if project.bank_details %}
-                        {% for line in project.bank_details.split('\n') %}
+            <!-- Terms & Conditions -->
+            <div class="mb-4">
+                <h6 class="fw-bold text-decoration-underline mb-2">Terms & Conditions</h6>
+                <div style="font-size: 9.5pt; line-height: 1.7;">
+                    {% if project.terms_conditions %}
+                        {% for line in project.terms_conditions.split('\n') %}
                             {% if line.strip() %}
                                 <div><strong>{{ line.strip() }}</strong></div>
                             {% endif %}
                         {% endfor %}
                     {% endif %}
                 </div>
-
-                <p style="font-size: 9pt; margin-top: 20px;">
-                    Should you require any further information, Please do not hesitate contact us, It will be a pleasure to discuss it
-                </p>
-
-                <div style="margin-top: 25px; font-size: 9.5pt;">
-                    <div>Thank You and Best regards,</div>
-                    <div class="mt-3">
-                        <strong>{{ project.signatory_name or 'Mohamed Faizal' }}</strong><br>
-                        <strong>{{ project.signatory_title or 'Rawaiya AL Etihad Est.' }}</strong>
-                    </div>
-                </div>
             </div>
 
-            <!-- Footer Banner -->
-            <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
+            <!-- Bank Details -->
+            <div class="mb-4" style="font-size: 9.5pt; line-height: 1.7;">
+                {% if project.bank_details %}
+                    {% for line in project.bank_details.split('\n') %}
+                        {% if line.strip() %}
+                            <div><strong>{{ line.strip() }}</strong></div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <p style="font-size: 9pt; margin-top: 25px;">
+                Should you require any further information, Please do not hesitate contact us, It will be a pleasure to discuss it
+            </p>
+
+            <div style="margin-top: 30px; font-size: 9.5pt;">
+                <div>Thank You and Best regards,</div>
+                <div class="mt-4">
+                    <strong>{{ project.signatory_name or 'Mohamed Faizal' }}</strong><br>
+                    <strong>{{ project.signatory_title or 'Rawaiya AL Etihad Est.' }}</strong>
+                </div>
+            </div>
         </div>
+
+        <!-- Footer Banner -->
+        <img src="{{ url_for('static', filename='img/image3.jpeg') }}" class="banner-footer" alt="Tameer Scaffolding Footer">
     </div>
 
-    <script>
-        function setLayout(mode) {
-            const v1 = document.getElementById('view1Page');
-            const v2 = document.getElementById('view2Page');
-            const b1 = document.getElementById('btn1Page');
-            const b2 = document.getElementById('btn2Page');
-
-            if (mode === 1) {
-                v1.classList.remove('d-none');
-                v2.classList.add('d-none');
-                b1.className = 'btn btn-dark fw-semibold';
-                b2.className = 'btn btn-outline-dark fw-semibold';
-            } else {
-                v1.classList.add('d-none');
-                v2.classList.remove('d-none');
-                b1.className = 'btn btn-outline-dark fw-semibold';
-                b2.className = 'btn btn-dark fw-semibold';
-            }
-        }
-    </script>
 </body>
 </html>

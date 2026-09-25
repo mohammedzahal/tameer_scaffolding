@@ -50,16 +50,16 @@ function filterCatalog() {
 
     filtered.forEach(item => {
         const div = document.createElement("div");
-        div.className = "list-group-item d-flex justify-content-between align-items-center py-2 px-3 border-0 border-bottom";
+        div.className = "list-group-item d-flex justify-content-between align-items-center py-3 px-3 border-0 border-bottom";
         div.innerHTML = `
             <div>
-                <span class="fw-semibold text-dark" style="font-size: 0.88rem;">${item.item_name}</span>
-                <span class="text-muted d-block" style="font-size: 0.75rem;">${item.category} • ${item.unit}</span>
+                <span class="fw-bold text-dark" style="font-size: 1.05rem;">${item.item_name}</span>
+                <span class="text-secondary d-block fw-medium" style="font-size: 0.88rem;">${item.category} • ${item.unit}</span>
             </div>
-            <div class="d-flex align-items-center gap-2">
-                <span class="text-dark small fw-semibold">SAR ${parseFloat(item.unit_price).toFixed(2)}</span>
-                <button type="button" class="btn btn-secondary-tmr btn-sm py-1 px-2" onclick="addItemFromCatalog(${item.item_id})">
-                    <i class="bi bi-plus"></i> Add
+            <div class="d-flex align-items-center gap-3">
+                <span class="text-dark fw-bold" style="font-size: 1.05rem;">SAR ${parseFloat(item.unit_price).toFixed(2)}</span>
+                <button type="button" class="btn btn-secondary-tmr btn-sm px-3" onclick="addItemFromCatalog(${item.item_id})">
+                    <i class="bi bi-plus-lg"></i> Add
                 </button>
             </div>
         `;
@@ -103,7 +103,7 @@ function addRow(data = {}) {
     const tr = document.createElement("tr");
     tr.className = "item-row";
     tr.innerHTML = `
-        <td class="text-center text-muted small row-sl">${rowIndex}</td>
+        <td class="text-center fw-bold row-sl">${rowIndex}</td>
         <td>
             <div class="position-relative">
                 <input type="text" class="form-control item-desc" value="${escapeHtml(data.desc || '')}" 
@@ -112,7 +112,7 @@ function addRow(data = {}) {
             </div>
         </td>
         <td>
-            <select class="form-select item-unit text-center">
+            <select class="form-select item-unit text-center fw-semibold">
                 <option value="Pcs." ${data.unit === 'Pcs.' ? 'selected' : ''}>Pcs.</option>
                 <option value="Mtr" ${data.unit === 'Mtr' ? 'selected' : ''}>Mtr</option>
                 <option value="Set" ${data.unit === 'Set' ? 'selected' : ''}>Set</option>
@@ -126,7 +126,7 @@ function addRow(data = {}) {
             <input type="number" class="form-control text-end item-rate" value="${parseFloat(data.rate || 0).toFixed(2)}" step="0.01" min="0" oninput="calculateRow(this)">
         </td>
         <td>
-            <input type="text" class="form-control text-end fw-semibold item-amount bg-light" value="0.00" readonly>
+            <input type="text" class="form-control text-end fw-bold item-amount bg-light" value="0.00" readonly>
         </td>
         <td>
             <input type="text" class="form-control item-remarks" value="${escapeHtml(data.remarks || '')}" placeholder="Optional note">
@@ -250,8 +250,8 @@ function showSuggestions(input) {
         const itemDiv = document.createElement("div");
         itemDiv.className = "autocomplete-suggestion";
         itemDiv.innerHTML = `
-            <span>${m.item_name} <small class="text-muted">(${m.category})</small></span>
-            <span class="text-muted small fw-semibold">SAR ${parseFloat(m.unit_price).toFixed(2)}</span>
+            <span><strong class="text-dark">${m.item_name}</strong> <span class="text-secondary fw-normal">(${m.category})</span></span>
+            <span class="text-dark fw-bold" style="font-size: 1rem;">SAR ${parseFloat(m.unit_price).toFixed(2)}</span>
         `;
         itemDiv.onclick = function () {
             selectCatalogItem(input, m);
