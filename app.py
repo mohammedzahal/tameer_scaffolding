@@ -20,13 +20,28 @@ app.secret_key = 'tameer_scaffolding_enterprise_secret_key'
 init_db()
 
 def get_project_dict(row):
-    """Converts a database row into a standardized dictionary."""
+    """Converts a database row into a standardized dictionary with robust defaults."""
     p = dict(row)
     try:
         items = json.loads(p.get('items_json') or '[]')
     except:
         items = []
     p['items'] = items
+    p['terms_conditions'] = p.get('terms_conditions') or DEFAULT_TERMS
+    p['bank_details'] = p.get('bank_details') or DEFAULT_BANK_DETAILS
+    p['signatory_name'] = p.get('signatory_name') or DEFAULT_SIGNATORY
+    p['signatory_title'] = p.get('signatory_title') or DEFAULT_SIGNATORY_TITLE
+    p['subject'] = p.get('subject') or 'Scaffolding Materials on sale basis(Used and Refurbed materials)'
+    p['intro_note'] = p.get('intro_note') or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:'
+    p['company_name'] = p.get('company_name') or ''
+    p['location'] = p.get('location') or 'Kingdom of Saudi Arabia'
+    p['attn'] = p.get('attn') or ''
+    p['yr_ref'] = p.get('yr_ref') or ''
+    p['quotation_ref'] = p.get('quotation_ref') or 'TMR-FZ-1748-55471-2026'
+    p['quotation_date'] = p.get('quotation_date') or datetime.now().strftime("%d %b %Y")
+    p['subtotal'] = float(p.get('subtotal') or 0.0)
+    p['vat_amount'] = float(p.get('vat_amount') or 0.0)
+    p['grand_total'] = float(p.get('grand_total') or 0.0)
     return p
 
 # --- DASHBOARD ---

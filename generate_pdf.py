@@ -188,22 +188,22 @@ def build_reportlab_pdf(quote_data):
         alignment=TA_RIGHT
     )
 
-    company_name = quote_data.get('company_name', '')
-    location = quote_data.get('location', '')
-    attn = quote_data.get('attn', '')
-    yr_ref = quote_data.get('yr_ref', '')
-    quotation_ref = quote_data.get('quotation_ref', 'REE-07-07/23')
-    quotation_date = quote_data.get('quotation_date', '')
-    subject = quote_data.get('subject', 'Scaffolding Materials on sale basis(Used and Refurbed materials)')
-    intro_note = quote_data.get('intro_note', 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:')
-    items = quote_data.get('items', [])
-    subtotal = float(quote_data.get('subtotal', 0.0))
-    vat_amount = float(quote_data.get('vat_amount', 0.0))
-    grand_total = float(quote_data.get('grand_total', 0.0))
-    terms = quote_data.get('terms_conditions', '')
-    bank_details = quote_data.get('bank_details', '')
-    sig_name = quote_data.get('signatory_name', 'Mohamed Faizal')
-    sig_title = quote_data.get('signatory_title', 'Rawaiya AL Etihad Est.')
+    company_name = quote_data.get('company_name') or ''
+    location = quote_data.get('location') or ''
+    attn = quote_data.get('attn') or ''
+    yr_ref = quote_data.get('yr_ref') or ''
+    quotation_ref = quote_data.get('quotation_ref') or 'REE-07-07/23'
+    quotation_date = quote_data.get('quotation_date') or ''
+    subject = quote_data.get('subject') or 'Scaffolding Materials on sale basis(Used and Refurbed materials)'
+    intro_note = quote_data.get('intro_note') or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:'
+    items = quote_data.get('items') or []
+    subtotal = float(quote_data.get('subtotal') or 0.0)
+    vat_amount = float(quote_data.get('vat_amount') or 0.0)
+    grand_total = float(quote_data.get('grand_total') or 0.0)
+    terms = quote_data.get('terms_conditions')
+    bank_details = quote_data.get('bank_details')
+    sig_name = quote_data.get('signatory_name') or 'Mohamed Faizal'
+    sig_title = quote_data.get('signatory_title') or 'Rawaiya AL Etihad Est.'
 
     story = []
 
@@ -320,23 +320,33 @@ def build_reportlab_pdf(quote_data):
     story.append(Spacer(1, 3 * mm))
 
     if terms:
-        for idx, t_line in enumerate(terms.split('\n'), 1):
-            if t_line.strip():
-                clean_term = re.sub(r'^\s*(\d+[\.\)]\s*)+', '', t_line.strip())
-                story.append(Paragraph(f"<b>{idx}. {clean_term}</b>", style_cell))
-                story.append(Spacer(1, 1.5 * mm))
+        if isinstance(terms, str):
+            terms_list = [l.strip() for l in terms.split('\n') if l.strip()]
+        elif isinstance(terms, list):
+            terms_list = terms
+        else:
+            terms_list = []
+        for idx, t_line in enumerate(terms_list, 1):
+            clean_term = re.sub(r'^\s*(\d+[\.\)]\s*)+', '', t_line)
+            story.append(Paragraph(f"<b>{idx}. {clean_term}</b>", style_cell))
+            story.append(Spacer(1, 1.5 * mm))
 
     story.append(Spacer(1, 4 * mm))
 
     # Bank Details
     if bank_details:
-        for b_line in bank_details.split('\n'):
-            if b_line.strip():
-                clean_bank = re.sub(r'^(Our\s*:\s*)+', '', b_line.strip())
-                if 'Bank' in clean_bank and not clean_bank.startswith('Our :'):
-                    clean_bank = f"Our : {clean_bank}"
-                story.append(Paragraph(f"<b>{clean_bank}</b>", style_cell))
-                story.append(Spacer(1, 1.2 * mm))
+        if isinstance(bank_details, str):
+            bank_list = [l.strip() for l in bank_details.split('\n') if l.strip()]
+        elif isinstance(bank_details, list):
+            bank_list = bank_details
+        else:
+            bank_list = []
+        for b_line in bank_list:
+            clean_bank = re.sub(r'^(Our\s*:\s*)+', '', b_line)
+            if 'Bank' in clean_bank and not clean_bank.startswith('Our :'):
+                clean_bank = f"Our : {clean_bank}"
+            story.append(Paragraph(f"<b>{clean_bank}</b>", style_cell))
+            story.append(Spacer(1, 1.2 * mm))
 
     story.append(Spacer(1, 4 * mm))
     story.append(Paragraph("Should you require any further information, Please do not hesitate contact us, It will be a pleasure to discuss it", style_intro))

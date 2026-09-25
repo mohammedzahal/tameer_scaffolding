@@ -41,22 +41,22 @@ def build_quote_excel(quote_data):
     right_align = Alignment(horizontal='right', vertical='center')
 
     # Data extraction
-    company_name = quote_data.get('company_name', '')
-    location = quote_data.get('location', '')
-    attn = quote_data.get('attn', '')
-    yr_ref = quote_data.get('yr_ref', '')
-    quotation_ref = quote_data.get('quotation_ref', 'TMR-FZ-1748-55471-2026')
-    quotation_date = quote_data.get('quotation_date', '')
-    subject = quote_data.get('subject', 'Scaffolding Materials on sale basis(Used and Refurbed materials)')
-    intro_note = quote_data.get('intro_note', 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:')
-    items = quote_data.get('items', [])
-    subtotal = float(quote_data.get('subtotal', 0.0))
-    vat_amount = float(quote_data.get('vat_amount', 0.0))
-    grand_total = float(quote_data.get('grand_total', 0.0))
-    terms = quote_data.get('terms_conditions', '')
-    bank_details = quote_data.get('bank_details', '')
-    sig_name = quote_data.get('signatory_name', 'Mohamed Faizal')
-    sig_title = quote_data.get('signatory_title', 'Rawaiya AL Etihad Est.')
+    company_name = quote_data.get('company_name') or ''
+    location = quote_data.get('location') or ''
+    attn = quote_data.get('attn') or ''
+    yr_ref = quote_data.get('yr_ref') or ''
+    quotation_ref = quote_data.get('quotation_ref') or 'TMR-FZ-1748-55471-2026'
+    quotation_date = quote_data.get('quotation_date') or ''
+    subject = quote_data.get('subject') or 'Scaffolding Materials on sale basis(Used and Refurbed materials)'
+    intro_note = quote_data.get('intro_note') or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:'
+    items = quote_data.get('items') or []
+    subtotal = float(quote_data.get('subtotal') or 0.0)
+    vat_amount = float(quote_data.get('vat_amount') or 0.0)
+    grand_total = float(quote_data.get('grand_total') or 0.0)
+    terms = quote_data.get('terms_conditions')
+    bank_details = quote_data.get('bank_details')
+    sig_name = quote_data.get('signatory_name') or 'Mohamed Faizal'
+    sig_title = quote_data.get('signatory_title') or 'Rawaiya AL Etihad Est.'
 
     # Row 1: Top Brand Banner
     ws.merge_cells('B1:H1')
@@ -227,7 +227,12 @@ def build_quote_excel(quote_data):
     current_row += 1
 
     if terms:
-        terms_lines = [l.strip() for l in terms.split('\n') if l.strip()]
+        if isinstance(terms, str):
+            terms_lines = [l.strip() for l in terms.split('\n') if l.strip()]
+        elif isinstance(terms, list):
+            terms_lines = terms
+        else:
+            terms_lines = []
         for line in terms_lines:
             ws['B{0}'.format(current_row)] = line
             ws['B{0}'.format(current_row)].font = font_regular
@@ -240,7 +245,12 @@ def build_quote_excel(quote_data):
     current_row += 1
 
     if bank_details:
-        bank_lines = [l.strip() for l in bank_details.split('\n') if l.strip()]
+        if isinstance(bank_details, str):
+            bank_lines = [l.strip() for l in bank_details.split('\n') if l.strip()]
+        elif isinstance(bank_details, list):
+            bank_lines = bank_details
+        else:
+            bank_lines = []
         for line in bank_lines:
             ws['B{0}'.format(current_row)] = line
             ws['B{0}'.format(current_row)].font = font_regular

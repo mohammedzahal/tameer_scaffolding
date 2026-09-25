@@ -61,18 +61,18 @@ def build_quote_word(quote_data):
 def _build_from_template(target_template, quote_data):
     doc = docx.Document(target_template)
 
-    company_name = quote_data.get('company_name', '')
-    location = quote_data.get('location', 'Kingdom of Saudi Arabia')
-    attn = quote_data.get('attn', '')
-    yr_ref = quote_data.get('yr_ref', '')
-    quotation_ref = quote_data.get('quotation_ref', 'TMR-FZ-1748-55471-2026')
-    quotation_date = quote_data.get('quotation_date', '24 Sep 2026')
-    subject = quote_data.get('subject', 'Scaffolding Materials on sale basis(Used and Refurbed materials)')
-    intro_note = quote_data.get('intro_note', 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:')
-    items = quote_data.get('items', [])
-    subtotal = float(quote_data.get('subtotal', 0.0))
-    vat_amount = float(quote_data.get('vat_amount', 0.0))
-    grand_total = float(quote_data.get('grand_total', 0.0))
+    company_name = quote_data.get('company_name') or ''
+    location = quote_data.get('location') or 'Kingdom of Saudi Arabia'
+    attn = quote_data.get('attn') or ''
+    yr_ref = quote_data.get('yr_ref') or ''
+    quotation_ref = quote_data.get('quotation_ref') or 'TMR-FZ-1748-55471-2026'
+    quotation_date = quote_data.get('quotation_date') or ''
+    subject = quote_data.get('subject') or 'Scaffolding Materials on sale basis(Used and Refurbed materials)'
+    intro_note = quote_data.get('intro_note') or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:'
+    items = quote_data.get('items') or []
+    subtotal = float(quote_data.get('subtotal') or 0.0)
+    vat_amount = float(quote_data.get('vat_amount') or 0.0)
+    grand_total = float(quote_data.get('grand_total') or 0.0)
 
     # 1. Update Date and Quotation Ref in Top-Right Textbox on Page 1
     # Standardized to Date and Ref only (removes Page 1 of 2 indicator)
@@ -209,11 +209,13 @@ def _build_from_template(target_template, quote_data):
             terms_para.runs[0].underline = True
 
     # 5. Standardize Terms & Conditions Typography
-    terms = quote_data.get('terms_conditions', '')
+    terms = quote_data.get('terms_conditions')
     if isinstance(terms, list):
         terms_lines = terms
-    else:
+    elif isinstance(terms, str) and terms.strip():
         terms_lines = [line.strip() for line in terms.split('\n') if line.strip()]
+    else:
+        terms_lines = []
 
     current_terms_idx = -1
     for i, p in enumerate(doc.paragraphs):
@@ -232,9 +234,15 @@ def _build_from_template(target_template, quote_data):
                     set_run_font(p_target.runs[0], STANDARD_FONT, 9.5, bold=(offset == 0))
 
     # 6. Standardize Bank Details Typography
-    bank_text = quote_data.get('bank_details', '')
-    if bank_text:
+    bank_text = quote_data.get('bank_details')
+    if isinstance(bank_text, list):
+        bank_lines = bank_text
+    elif isinstance(bank_text, str) and bank_text.strip():
         bank_lines = [l.strip() for l in bank_text.split('\n') if l.strip()]
+    else:
+        bank_lines = []
+
+    if bank_lines:
         for p in doc.paragraphs:
             if 'Saudi National Bank' in p.text and len(bank_lines) > 0:
                 first_bank_line = re.sub(r'^(Our\s*:\s*)+', '', bank_lines[0])
@@ -282,18 +290,18 @@ def _build_dynamically(quote_data):
         section.left_margin = Inches(0.75)
         section.right_margin = Inches(0.75)
 
-    company_name = quote_data.get('company_name', '')
-    location = quote_data.get('location', 'Kingdom of Saudi Arabia')
-    attn = quote_data.get('attn', '')
-    yr_ref = quote_data.get('yr_ref', '')
-    quotation_ref = quote_data.get('quotation_ref', 'TMR-FZ-1748-55471-2026')
-    quotation_date = quote_data.get('quotation_date', '')
-    subject = quote_data.get('subject', 'Scaffolding Materials on sale basis(Used and Refurbed materials)')
-    intro_note = quote_data.get('intro_note', 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:')
-    items = quote_data.get('items', [])
-    subtotal = float(quote_data.get('subtotal', 0.0))
-    vat_amount = float(quote_data.get('vat_amount', 0.0))
-    grand_total = float(quote_data.get('grand_total', 0.0))
+    company_name = quote_data.get('company_name') or ''
+    location = quote_data.get('location') or 'Kingdom of Saudi Arabia'
+    attn = quote_data.get('attn') or ''
+    yr_ref = quote_data.get('yr_ref') or ''
+    quotation_ref = quote_data.get('quotation_ref') or 'TMR-FZ-1748-55471-2026'
+    quotation_date = quote_data.get('quotation_date') or ''
+    subject = quote_data.get('subject') or 'Scaffolding Materials on sale basis(Used and Refurbed materials)'
+    intro_note = quote_data.get('intro_note') or 'We thank you for whatsapp inquiry and pleased quote for used equipment as follows:'
+    items = quote_data.get('items') or []
+    subtotal = float(quote_data.get('subtotal') or 0.0)
+    vat_amount = float(quote_data.get('vat_amount') or 0.0)
+    grand_total = float(quote_data.get('grand_total') or 0.0)
 
     # Header / Title
     p_title = doc.add_paragraph()
@@ -389,11 +397,13 @@ def _build_dynamically(quote_data):
     r.underline = True
     set_run_font(r, STANDARD_FONT, 10.5, bold=True)
 
-    terms = quote_data.get('terms_conditions', '')
+    terms = quote_data.get('terms_conditions')
     if isinstance(terms, list):
         terms_lines = terms
-    else:
+    elif isinstance(terms, str) and terms.strip():
         terms_lines = [line.strip() for line in terms.split('\n') if line.strip()]
+    else:
+        terms_lines = []
 
     for t_line in terms_lines:
         p_t = doc.add_paragraph()
@@ -402,10 +412,17 @@ def _build_dynamically(quote_data):
         set_run_font(r_t, STANDARD_FONT, 9.5, bold=False)
 
     # Bank Details
-    bank_text = quote_data.get('bank_details', '')
-    if bank_text:
+    bank_text = quote_data.get('bank_details')
+    if isinstance(bank_text, list):
+        bank_lines = bank_text
+    elif isinstance(bank_text, str) and bank_text.strip():
+        bank_lines = [l.strip() for l in bank_text.split('\n') if l.strip()]
+    else:
+        bank_lines = []
+
+    if bank_lines:
         doc.add_paragraph()
-        for b_line in bank_text.split('\n'):
+        for b_line in bank_lines:
             if b_line.strip():
                 p_b = doc.add_paragraph()
                 r_b = p_b.add_run(b_line.strip())
