@@ -31,10 +31,15 @@ body {
     background: #FFFFFF;
     border-bottom: 1px solid var(--tmr-border);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+    min-height: 58px;
+    display: flex;
+    align-items: center;
 }
 
 .brand-link {
     text-decoration: none;
+    display: inline-flex;
+    align-items: center;
     transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
@@ -43,10 +48,10 @@ body {
 }
 
 .brand-emblem-img {
-    height: 70px;
-    width: 70px;
+    height: 52px;
+    width: 52px;
     object-fit: contain;
-    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.16));
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.14));
     transition: transform 0.2s ease;
 }
 
@@ -57,21 +62,21 @@ body {
 .brand-title {
     font-family: 'Poppins', sans-serif;
     font-weight: 800;
-    font-size: 1.65rem;
+    font-size: 1.35rem;
     letter-spacing: -0.03em;
     color: #0F172A;
-    line-height: 1.05;
+    line-height: 1;
 }
 
 .brand-sub {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
-    font-size: 0.78rem;
-    letter-spacing: 0.22em;
+    font-size: 0.68rem;
+    letter-spacing: 0.20em;
     color: #475569;
     text-transform: uppercase;
     line-height: 1;
-    margin-top: 3px;
+    margin-top: 2px;
 }
 
 .nav-link-custom {
