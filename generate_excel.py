@@ -23,11 +23,11 @@ def build_quote_excel(quote_data):
     font_regular = Font(name=STANDARD_FONT, size=9.0)
     font_italic = Font(name=STANDARD_FONT, size=8.5, italic=True)
 
-    fill_brand = PatternFill(start_color="7D1924", end_color="7D1924", fill_type="solid")
-    fill_brand_dark = PatternFill(start_color="5A101A", end_color="5A101A", fill_type="solid")
-    fill_header = PatternFill(start_color="8B1E2D", end_color="8B1E2D", fill_type="solid")
-    fill_totals = PatternFill(start_color="F5ECEE", end_color="F5ECEE", fill_type="solid")
-    fill_grand = PatternFill(start_color="EAD5D8", end_color="EAD5D8", fill_type="solid")
+    fill_brand = PatternFill(start_color="0F172A", end_color="0F172A", fill_type="solid")
+    fill_brand_dark = PatternFill(start_color="000000", end_color="000000", fill_type="solid")
+    fill_header = PatternFill(start_color="18181B", end_color="18181B", fill_type="solid")
+    fill_totals = PatternFill(start_color="F8FAFC", end_color="F8FAFC", fill_type="solid")
+    fill_grand = PatternFill(start_color="E2E8F0", end_color="E2E8F0", fill_type="solid")
 
     thin_border_side = Side(style='thin', color='CCCCCC')
     dark_border_side = Side(style='thin', color='888888')
