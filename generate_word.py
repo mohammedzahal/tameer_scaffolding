@@ -8,7 +8,9 @@ import io
 import os
 import re
 
-TEMPLATE_PATH = r'D:\TAMEER\Quotations\Word\quotation ref.docx'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+TEMPLATE_PATH = os.path.join(BASE_DIR, 'assets', 'quotation_template.docx')
+FALLBACK_LOCAL_PATH = r'D:\TAMEER\Quotations\Word\quotation ref.docx'
 
 STANDARD_FONT = "Arial"
 
@@ -34,7 +36,10 @@ def build_quote_word(quote_data):
     """
     Builds a Word document (.docx) using standardized Arial typography and official Tameer layout.
     """
-    doc = docx.Document(TEMPLATE_PATH)
+    target_template = TEMPLATE_PATH if os.path.exists(TEMPLATE_PATH) else FALLBACK_LOCAL_PATH
+    if not os.path.exists(target_template):
+        raise FileNotFoundError(f"Quotation Word template not found at {TEMPLATE_PATH} or {FALLBACK_LOCAL_PATH}")
+    doc = docx.Document(target_template)
 
     company_name = quote_data.get('company_name', '')
     location = quote_data.get('location', 'Kingdom of Saudi Arabia')
